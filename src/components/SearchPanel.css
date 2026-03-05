@@ -1,0 +1,124 @@
+.search-panel {
+  position: absolute;
+  top: 50px;
+  right: 16px;
+  width: 400px;
+  background: #2d2d2d;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  transition: all 0.3s;
+}
+
+.search-panel.collapsed {
+  width: 100px;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #404040;
+}
+
+.search-header:hover {
+  background: #353535;
+}
+
+.search-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.toggle-icon {
+  color: #888;
+  font-size: 12px;
+}
+
+.search-content {
+  padding: 16px;
+}
+
+.search-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 12px;
+  background: #1e1e1e;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #007acc;
+}
+
+.search-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 40px;
+  background: #404040;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: #505050;
+}
+
+.nav-btn:active:not(:disabled) {
+  background: #353535;
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.search-options {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+}
+
+.option-label:hover {
+  color: #d4d4d4;
+}
+
+.option-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #007acc;
+}
+
+.search-stats {
+  font-size: 13px;
+  color: #888;
+}
