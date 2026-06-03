@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react'
-import { FixedSizeList as List } from 'react-window'
-import { SearchResult, SearchOptions } from '../types'
+import { SearchResult, SearchOptions, HighlightConfig, SearchHighlight } from '../types'
+import ContextMenu from './ContextMenu'
 import './LogViewer.css'
 
 interface LogViewerProps {
@@ -11,8 +11,16 @@ interface LogViewerProps {
   currentResultIndex: number
   searchQuery: string
   searchOptions: SearchOptions
+  searchHighlights: SearchHighlight[]
+  lineOffsets?: number[]
   targetLine?: number
+  highlightedLine?: number
+  highlightConfig?: HighlightConfig
+  onContentChange?: (newContent: string) => void
+  onCreateNewFile?: () => void
 }
+
+const BUFFER_SIZE = 20
 
 const LogViewer: React.FC<LogViewerProps> = ({
   content,
@@ -22,100 +30,356 @@ const LogViewer: React.FC<LogViewerProps> = ({
   currentResultIndex,
   searchQuery,
   searchOptions,
-  targetLine
+  searchHighlights,
+  lineOffsets,
+  targetLine,
+  highlightedLine,
+  onContentChange,
+  onCreateNewFile
 }) => {
-  const listRef = useRef<List>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [containerHeight, setContainerHeight] = useState(400)
-  const lines = useMemo(() => content.split('\n'), [content])
-  const lineCount = lines.length
+  const contentRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [activeHighlight, setActiveHighlight] = useState<number | undefined>(undefined)
+  const [selectedText, setSelectedText] = useState<string>('')
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
+  const [scrollTop, setScrollTop] = useState(0)
+  const [containerHeight, setContainerHeight] = useState(0)
+  const [editMode, setEditMode] = useState(false)
+  const [editContent, setEditContent] = useState(content)
 
-  const updateHeight = useCallback(() => {
+  const lineCount = lineOffsets ? lineOffsets.length : content.split('\n').length
+  const totalHeight = lineCount * lineHeight
+
+  const getLine = useCallback((index: number): string => {
+    if (!content) return ''
+    if (lineOffsets && lineOffsets.length > index) {
+      const start = lineOffsets[index]
+      const end = index + 1 < lineOffsets.length ? lineOffsets[index + 1] - 1 : content.length
+      return content.substring(start, end)
+    }
+    return content.split('\n')[index] || ''
+  }, [content, lineOffsets])
+
+  const startIndex = Math.max(0, Math.floor(scrollTop / lineHeight) - BUFFER_SIZE)
+  const endIndex = Math.min(
+    lineCount - 1,
+    Math.ceil((scrollTop + containerHeight) / lineHeight) + BUFFER_SIZE
+  )
+
+  const visibleLines = useMemo(() => {
+    const result = []
+    for (let i = startIndex; i <= endIndex; i++) {
+      result.push({ index: i, line: getLine(i) })
+    }
+    return result
+  }, [startIndex, endIndex, getLine])
+
+  const handleScroll = useCallback(() => {
     if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect()
-      const headerHeight = 36
-      setContainerHeight(Math.max(rect.height - headerHeight, 100))
+      setScrollTop(containerRef.current.scrollTop)
     }
   }, [])
 
   useEffect(() => {
-    updateHeight()
-    window.addEventListener('resize', updateHeight)
-    
-    const timer = setTimeout(updateHeight, 100)
-    const timer2 = setTimeout(updateHeight, 500)
-    
+    const container = containerRef.current
+    if (container) {
+      const observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          setContainerHeight(entry.contentRect.height)
+        }
+      })
+      observer.observe(container)
+      setContainerHeight(container.clientHeight)
+      return () => observer.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (highlightedLine !== undefined) {
+      setActiveHighlight(highlightedLine)
+      const timer = setTimeout(() => {
+        setActiveHighlight(undefined)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [highlightedLine])
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      const selection = window.getSelection()
+      if (selection && selection.toString().trim()) {
+        const text = selection.toString().trim()
+        if (text.length > 1 && text.length < 100) {
+          setSelectedText(text)
+        }
+      }
+    }
+
+    const handleDblClick = () => {
+      const selection = window.getSelection()
+      if (selection && selection.toString().trim()) {
+        const text = selection.toString()
+        navigator.clipboard.writeText(text)
+      }
+    }
+
+    const handleClick = (e: MouseEvent) => {
+      const selection = window.getSelection()
+      if (!selection || !selection.toString().trim()) {
+        if (e.target && !containerRef.current?.contains(e.target as Node)) {
+          setSelectedText('')
+        }
+      }
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'c') {
+        const selection = window.getSelection()
+        if (selection && selection.toString().trim()) {
+          const text = selection.toString()
+          navigator.clipboard.writeText(text)
+        }
+      }
+    }
+
+    document.addEventListener('mouseup', handleMouseUp)
+    document.addEventListener('click', handleClick)
+    document.addEventListener('keydown', handleKeyDown)
+    containerRef.current?.addEventListener('dblclick', handleDblClick)
+
     return () => {
-      window.removeEventListener('resize', updateHeight)
-      clearTimeout(timer)
-      clearTimeout(timer2)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('click', handleClick)
+      document.removeEventListener('keydown', handleKeyDown)
+      containerRef.current?.removeEventListener('dblclick', handleDblClick)
     }
-  }, [updateHeight])
+  }, [])
 
   useEffect(() => {
-    if (currentResultIndex >= 0 && searchResults[currentResultIndex] && listRef.current) {
-      const line = searchResults[currentResultIndex].line
-      listRef.current.scrollToItem(line, 'center')
+    if (targetLine !== undefined && containerRef.current) {
+      const container = containerRef.current
+      const containerHeight = container.clientHeight
+      const scrollTop = targetLine * lineHeight - containerHeight / 2
+      container.scrollTo({
+        top: Math.max(0, scrollTop),
+        behavior: 'instant'
+      })
     }
-  }, [currentResultIndex, searchResults])
+  }, [targetLine, lineHeight])
 
   useEffect(() => {
-    if (targetLine !== undefined && targetLine >= 0 && listRef.current) {
-      listRef.current.scrollToItem(targetLine, 'center')
+    if (editMode) {
+      setEditContent(content)
     }
-  }, [targetLine])
+  }, [editMode, content])
 
-  const highlightLine = (line: string, lineIndex: number) => {
-    if (!searchQuery) return line
+  const enterEditMode = useCallback(() => {
+    setEditContent(content)
+    setEditMode(true)
+  }, [content])
 
-    const isCurrentResult = currentResultIndex >= 0 && 
+  const saveEdit = useCallback(() => {
+    if (onContentChange) {
+      onContentChange(editContent)
+    }
+    setEditMode(false)
+  }, [editContent, onContentChange])
+
+  const cancelEdit = useCallback(() => {
+    setEditMode(false)
+    setEditContent(content)
+  }, [content])
+
+  useEffect(() => {
+    if (!editMode) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        saveEdit()
+      } else if (e.key === 'Escape') {
+        cancelEdit()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [editMode, saveEdit, cancelEdit])
+
+  useEffect(() => {
+    if (currentResultIndex >= 0 && searchResults[currentResultIndex] && containerRef.current) {
+      const result = searchResults[currentResultIndex]
+      const scrollTarget = result.line * lineHeight - containerHeight / 2 + lineHeight / 2
+      containerRef.current.scrollTo({
+        top: Math.max(0, scrollTarget),
+        behavior: 'smooth'
+      })
+    }
+  }, [currentResultIndex, searchResults, lineHeight, containerHeight])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleSelectAll = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'a' && !editMode) {
+        e.preventDefault()
+        const selection = window.getSelection()
+        if (selection) {
+          selection.removeAllRanges()
+          const range = document.createRange()
+          const contentEl = contentRef.current
+          if (contentEl) {
+            range.selectNodeContents(contentEl)
+            selection.addRange(range)
+          }
+        }
+      }
+    }
+
+    container.addEventListener('keydown', handleSelectAll)
+    return () => container.removeEventListener('keydown', handleSelectAll)
+  }, [editMode, content, startIndex, endIndex, lineHeight])
+
+  const highlightLine = useCallback((line: string, lineIndex: number) => {
+    if (!searchQuery && !selectedText && searchHighlights.length === 0) return line
+
+    const isCurrentResult = currentResultIndex >= 0 &&
       searchResults[currentResultIndex]?.line === lineIndex
 
-    let regex: RegExp
-    try {
-      if (searchOptions.useRegex) {
-        regex = new RegExp(searchQuery, searchOptions.caseSensitive ? 'g' : 'gi')
-      } else {
-        const escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        const pattern = searchOptions.wholeWord ? `\\b${escapedQuery}\\b` : escapedQuery
-        regex = new RegExp(pattern, searchOptions.caseSensitive ? 'g' : 'gi')
+    const highlightedText: { start: number; end: number; className: string; color?: string }[] = []
+
+    const processSearchQuery = (query: string, options: SearchOptions, color?: string) => {
+      let regex: RegExp
+      try {
+        if (options.useRegex) {
+          regex = new RegExp(query, options.caseSensitive ? 'g' : 'gi')
+        } else {
+          const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          const pattern = options.wholeWord ? `\\b${escapedQuery}\\b` : escapedQuery
+          regex = new RegExp(pattern, options.caseSensitive ? 'g' : 'gi')
+        }
+      } catch {
+        return
       }
-    } catch {
-      return line
+
+      let match: RegExpExecArray | null
+      let safetyCounter = 0
+      const maxIterations = 100
+
+      while ((match = regex.exec(line)) !== null && safetyCounter < maxIterations) {
+        safetyCounter++
+
+        if (match[0].length === 0) {
+          regex.lastIndex++
+          continue
+        }
+
+        const isCurrentMatch = isCurrentResult && query === searchQuery && match.index === searchResults[currentResultIndex]?.start
+
+        highlightedText.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          className: isCurrentMatch ? 'highlight-current' : 'highlight',
+          color: color
+        })
+
+        if (regex.lastIndex === match.index) {
+          regex.lastIndex++
+        }
+      }
     }
+
+    if (searchQuery) {
+      processSearchQuery(searchQuery, searchOptions)
+    }
+
+    for (const highlight of searchHighlights) {
+      if (highlight.query !== searchQuery || JSON.stringify(highlight.options) !== JSON.stringify(searchOptions)) {
+        processSearchQuery(highlight.query, highlight.options, highlight.color)
+      }
+    }
+
+    if (selectedText) {
+      const escapedText = selectedText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(escapedText, 'gi')
+
+      let match: RegExpExecArray | null
+      let safetyCounter = 0
+      const maxIterations = 100
+
+      while ((match = regex.exec(line)) !== null && safetyCounter < maxIterations) {
+        safetyCounter++
+
+        if (match[0].length === 0) {
+          regex.lastIndex++
+          continue
+        }
+
+        let hasConflict = false
+        for (const existing of highlightedText) {
+          if (!(match.index + match[0].length <= existing.start || match.index >= existing.end)) {
+            hasConflict = true
+            break
+          }
+        }
+
+        if (!hasConflict) {
+          highlightedText.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            className: 'highlight-selected'
+          })
+        }
+
+        if (regex.lastIndex === match.index) {
+          regex.lastIndex++
+        }
+      }
+    }
+
+    if (highlightedText.length === 0) return line
+
+    highlightedText.sort((a, b) => {
+      const priorityOrder: Record<string, number> = { 'highlight-current': 0, 'highlight': 1, 'highlight-selected': 2 }
+      const priorityA = priorityOrder[a.className] ?? 3
+      const priorityB = priorityOrder[b.className] ?? 3
+      if (priorityA !== priorityB) return priorityA - priorityB
+      return a.start - b.start
+    })
+
+    const mergedHighlights: typeof highlightedText = []
+    for (const current of highlightedText) {
+      let hasOverlap = false
+      for (const existing of mergedHighlights) {
+        if (!(current.end <= existing.start || current.start >= existing.end)) {
+          hasOverlap = true
+          break
+        }
+      }
+      if (!hasOverlap) {
+        mergedHighlights.push(current)
+      }
+    }
+
+    mergedHighlights.sort((a, b) => a.start - b.start)
 
     const parts: JSX.Element[] = []
     let lastIndex = 0
-    let match: RegExpExecArray | null
-    let safetyCounter = 0
-    const maxIterations = 100
 
-    while ((match = regex.exec(line)) !== null && safetyCounter < maxIterations) {
-      safetyCounter++
-      
-      if (match[0].length === 0) {
-        regex.lastIndex++
-        continue
+    for (const highlight of mergedHighlights) {
+      if (highlight.start > lastIndex) {
+        parts.push(<span key={`${lineIndex}-${lastIndex}`}>{line.slice(lastIndex, highlight.start)}</span>)
       }
-      
-      if (match.index > lastIndex) {
-        parts.push(<span key={`${lineIndex}-${lastIndex}`}>{line.slice(lastIndex, match.index)}</span>)
-      }
-      const isCurrentMatch = isCurrentResult && 
-        match.index === searchResults[currentResultIndex]?.start
       parts.push(
         <span
-          key={`${lineIndex}-${match.index}`}
-          className={isCurrentMatch ? 'highlight-current' : 'highlight'}
+          key={`${lineIndex}-${highlight.start}`}
+          className={highlight.className}
+          style={highlight.color ? { backgroundColor: highlight.color } : undefined}
         >
-          {match[0]}
+          {line.slice(highlight.start, highlight.end)}
         </span>
       )
-      lastIndex = match.index + match[0].length
-      
-      if (regex.lastIndex === match.index) {
-        regex.lastIndex++
-      }
+      lastIndex = highlight.end
     }
 
     if (lastIndex < line.length) {
@@ -123,46 +387,134 @@ const LogViewer: React.FC<LogViewerProps> = ({
     }
 
     return parts.length > 0 ? parts : line
-  }
-
-  const handleCopy = (line: string) => {
-    navigator.clipboard.writeText(line)
-  }
-
-  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-    const line = lines[index]
-    const hasError = searchResults.some(r => r.line === index)
-    const isCurrentResult = currentResultIndex >= 0 && 
-      searchResults[currentResultIndex]?.line === index
-
-    return (
-      <div
-        style={{ ...style, height: lineHeight, fontSize: `${fontSize}px`, lineHeight: `${lineHeight}px` }}
-        className={`log-line ${hasError ? 'has-error' : ''} ${isCurrentResult ? 'current-result' : ''}`}
-        onDoubleClick={() => handleCopy(line)}
-      >
-        <span className="line-number">{index + 1}</span>
-        <span className="line-content">{highlightLine(line, index)}</span>
-      </div>
-    )
-  }
+  }, [searchQuery, selectedText, currentResultIndex, searchResults, searchOptions, searchHighlights])
 
   return (
-    <div className="log-viewer" ref={containerRef}>
+    <div className="log-viewer">
       <div className="log-header">
-        <span className="line-count">共 {lineCount.toLocaleString()} 行</span>
-        <span className="hint">双击行可复制内容</span>
+        <span className="line-count">{lineCount.toLocaleString()} 行</span>
+        <span className="hint">支持 Ctrl+F 查找 | Ctrl+G 跳转行 | Ctrl+A 全选</span>
+        <div className="log-header-actions">
+          {editMode ? (
+            <>
+              <button className="edit-btn save" onClick={saveEdit} title="保存编辑 (Ctrl+S)">💾 保存</button>
+              <button className="edit-btn cancel" onClick={cancelEdit} title="取消编辑">✕ 取消</button>
+            </>
+          ) : (
+            <button className="edit-btn" onClick={enterEditMode} title="编辑内容">✏️ 编辑</button>
+          )}
+        </div>
       </div>
-      <List
-        ref={listRef}
-        height={containerHeight}
-        itemCount={lineCount}
-        itemSize={lineHeight}
-        width="100%"
-        className="log-list"
+      {editMode ? (
+        <div className="edit-mode-container">
+          <div className="edit-line-numbers" style={{ fontSize: `${fontSize}px`, lineHeight: `${lineHeight}px` }}>
+            {editContent.split('\n').map((_, i) => (
+              <div key={i} style={{ height: `${lineHeight}px` }}>{i + 1}</div>
+            ))}
+          </div>
+          <textarea
+            ref={textareaRef}
+            className="edit-textarea"
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            style={{
+              fontSize: `${fontSize}px`,
+              lineHeight: `${lineHeight}px`
+            }}
+            spellCheck={false}
+          />
+        </div>
+      ) : (
+      <div
+        className="log-content"
+        ref={containerRef}
+        onScroll={handleScroll}
+        onContextMenu={(e) => {
+          e.preventDefault()
+          setContextMenu({ x: e.clientX, y: e.clientY })
+        }}
       >
-        {Row}
-      </List>
+        <div style={{ height: totalHeight, position: 'relative' }}>
+          <div style={{ position: 'absolute', top: startIndex * lineHeight, width: '100%' }} ref={contentRef}>
+            {visibleLines.map(({ index, line }) => (
+              <div
+                key={index}
+                data-line={index}
+                className={`log-line ${activeHighlight === index ? 'active-highlight' : ''}`}
+                style={{ 
+                  fontSize: `${fontSize}px`, 
+                  lineHeight: `${lineHeight}px`,
+                  minHeight: `${lineHeight}px`
+                }}
+              >
+                <span className="line-number">{index + 1}</span>
+                <span className="line-text">{highlightLine(line, index)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      )}
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu(null)}
+          items={[
+            {
+              label: '复制',
+              shortcut: 'Ctrl+C',
+              action: () => {
+                if (selectedText) {
+                  navigator.clipboard.writeText(selectedText)
+                }
+              }
+            },
+            {
+              label: '剪切',
+              shortcut: 'Ctrl+X',
+              action: () => {
+                if (selectedText && onContentChange) {
+                  navigator.clipboard.writeText(selectedText)
+                }
+              }
+            },
+            {
+              label: '粘贴',
+              shortcut: 'Ctrl+V',
+              action: async () => {
+                if (onContentChange) {
+                  await navigator.clipboard.readText()
+                }
+              }
+            },
+            { label: '', divider: true, action: () => {} },
+            {
+              label: '全选',
+              shortcut: 'Ctrl+A',
+              action: () => {
+                const selection = window.getSelection()
+                if (selection && containerRef.current) {
+                  const range = document.createRange()
+                  range.selectNodeContents(containerRef.current)
+                  selection.removeAllRanges()
+                  selection.addRange(range)
+                }
+              }
+            },
+            { label: '', divider: true, action: () => {} },
+            {
+              label: '新建空白文件',
+              shortcut: '',
+              action: () => {
+                if (onCreateNewFile) {
+                  onCreateNewFile()
+                }
+              }
+            }
+          ]}
+        />
+      )}
     </div>
   )
 }

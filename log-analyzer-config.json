@@ -1,0 +1,110 @@
+{
+  "errorKeywords": [
+    {
+      "keyword": "print_err",
+      "description": "该错误为打印模块，请找打印团队分析",
+      "enabled": false
+    },
+    {
+      "keyword": "copy_err",
+      "description": "该错误为复制模块，请找文件传输团队分析",
+      "enabled": true
+    },
+    {
+      "keyword": "scan_err",
+      "description": "该错误为扫描模块，请找扫描团队分析",
+      "enabled": true
+    },
+    {
+      "keyword": "error",
+      "description": "通用错误，请检查日志上下文",
+      "enabled": true
+    },
+    {
+      "keyword": "exception",
+      "description": "异常抛出，请找开发团队分析",
+      "enabled": true
+    },
+    {
+      "keyword": "fatal",
+      "description": "致命错误，请立即联系运维团队",
+      "enabled": true
+    },
+    {
+      "keyword": "fail",
+      "description": "操作失败，请检查相关模块",
+      "enabled": true
+    },
+    {
+      "keyword": "warning",
+      "description": "警告信息，请留意相关日志",
+      "enabled": true
+    }
+  ],
+  "jobKeywords": [
+    {
+      "keyword": "new job,",
+      "description": "作业开始标记",
+      "enabled": true
+    },
+    {
+      "keyword": "start job",
+      "description": "作业开始",
+      "enabled": true
+    },
+    {
+      "keyword": "begin job",
+      "description": "作业开始",
+      "enabled": true
+    }
+  ],
+  "ignoreKeywords": [
+    {
+      "keyword": "DEBUG",
+      "description": "调试信息",
+      "enabled": true
+    },
+    {
+      "keyword": "INFO",
+      "description": "普通信息",
+      "enabled": true
+    },
+    {
+      "keyword": "TRACE",
+      "description": "跟踪信息",
+      "enabled": true
+    }
+  ],
+  "coreDumpKeywords": [
+    {
+      "keyword": "coredump",
+      "description": "核心转储",
+      "enabled": true
+    },
+    {
+      "keyword": "core dump",
+      "description": "核心转储",
+      "enabled": true
+    },
+    {
+      "keyword": "segmentation fault",
+      "description": "段错误",
+      "enabled": true
+    },
+    {
+      "keyword": "SIGSEGV",
+      "description": "段错误信号",
+      "enabled": true
+    },
+    {
+      "keyword": "core dumped",
+      "description": "核心已转储",
+      "enabled": true
+    }
+  ],
+  "highlightConfig": {
+    "backgroundColor": "#ffeb3b",
+    "textColor": "#000000",
+    "borderColor": "#f9a825"
+  }
+}

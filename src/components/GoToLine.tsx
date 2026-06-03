@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { logger, logCategories } from '../utils/logger'
 import './GoToLine.css'
 
 interface GoToLineProps {
@@ -48,20 +49,24 @@ const GoToLine: React.FC<GoToLineProps> = ({
     const num = parseInt(trimmed, 10)
     
     if (isNaN(num)) {
+      logger.warning(logCategories.APP, '跳转行号失败', '输入的不是有效数字')
       setError('请输入有效的数字')
       return
     }
 
     if (num < 1) {
+      logger.warning(logCategories.APP, '跳转行号失败', '行号必须大于0')
       setError('行号必须大于0')
       return
     }
 
     if (num > totalLines) {
+      logger.warning(logCategories.APP, '跳转行号失败', `行号 ${num} 超过总行数 ${totalLines}`)
       setError(`行号不能超过总行数 ${totalLines}`)
       return
     }
 
+    logger.info(logCategories.APP, '跳转行号成功', `跳转到第 ${num} 行`)
     onGoToLine(num - 1)
     setLineNumber('')
     onClose()

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据管理 - Log Analyzer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1e1e1e; color: #ffffff; min-height: 100vh; }
+    .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #2d2d2d; border-radius: 12px; margin-bottom: 20px; }
+    .header h1 { font-size: 20px; display: flex; align-items: center; gap: 8px; }
+    .device-info { font-size: 13px; color: #888888; }
+    .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+    .search-input { padding: 10px 16px; border: 1px solid #3a3a3a; border-radius: 8px; background: #2d2d2d; color: #ffffff; font-size: 14px; width: 250px; }
+    .search-input:focus { outline: none; border-color: #4a9eff; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .btn-primary { background: #4a9eff; color: white; }
+    .btn-primary:hover { background: #3a8eef; }
+    .btn-secondary { background: #2d7d46; color: white; }
+    .btn-secondary:hover { background: #246b38; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-small { padding: 6px 12px; font-size: 12px; }
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; background: #2d2d2d; padding: 4px; border-radius: 10px; }
+    .tab { flex: 1; padding: 12px 20px; border: none; background: transparent; color: #888888; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .tab:hover { color: #ffffff; }
+    .tab.active { background: #1e1e1e; color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .data-section { background: #2d2d2d; border-radius: 12px; padding: 20px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .section-header h3 { font-size: 16px; color: #ffffff; }
+    .table-container { max-height: 500px; overflow-y: auto; border: 1px solid #3a3a3a; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { position: sticky; top: 0; background: #383838; z-index: 1; }
+    th { padding: 14px 16px; text-align: left; color: #888888; font-weight: 500; font-size: 13px; border-bottom: 1px solid #3a3a3a; }
+    td { padding: 8px 12px; border-bottom: 1px solid #3a3a3a; font-size: 14px; }
+    tr:hover { background: #383838; }
+    tr:last-child td { border-bottom: none; }
+    .editable-input { width: 100%; padding: 8px 10px; border: 1px solid #3a3a3a; border-radius: 6px; background: #2d2d2d; color: #ffffff; font-size: 14px; transition: border-color 0.2s; }
+    .editable-input:focus { outline: none; border-color: #4a9eff; background: #363636; }
+    .editable-input:hover { border-color: #555555; }
+    .action-cell { display: flex; gap: 8px; }
+    .empty-row td { text-align: center; padding: 40px !important; color: #888888; }
+    .result-toast { position: fixed; bottom: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 10px; z-index: 1001; animation: slideIn 0.3s ease; }
+    .result-toast.success { background: #2d7d46; color: #4ade80; }
+    .result-toast.error { background: #dc2626; color: #f87171; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .loading { display: flex; justify-content: center; align-items: center; height: 200px; color: #888; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="loading">加载中...</div>
+  </div>
+  <script src="dist/sync-panel-bundle.js"></script>
+</body>
+</html>

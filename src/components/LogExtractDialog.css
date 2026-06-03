@@ -1,0 +1,236 @@
+.log-extract-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.log-extract-dialog {
+  width: 480px;
+  max-width: 90vw;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.log-extract-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.log-extract-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--text-primary);
+}
+
+.log-extract-content {
+  padding: 18px;
+}
+
+.extract-mode-group {
+  margin-bottom: 16px;
+}
+
+.mode-label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-option:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+}
+
+.mode-option.active {
+  border-color: var(--accent-color);
+  background: rgba( var(--accent-color), 0.1);
+}
+
+.mode-option input {
+  display: none;
+}
+
+.mode-icon {
+  font-size: 24px;
+}
+
+.mode-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mode-text strong {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.mode-text small {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.extract-params {
+  padding: 14px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.param-label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.count-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.count-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.count-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.count-selector input {
+  width: 60px;
+  height: 32px;
+  text-align: center;
+  font-size: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+}
+
+.count-selector input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.param-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.keyword-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.keyword-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.log-extract-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.cancel-btn,
+.extract-btn {
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.cancel-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.cancel-btn:hover {
+  background: var(--bg-hover);
+}
+
+.extract-btn {
+  background: var(--accent-color);
+  color: white;
+}
+
+.extract-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.extract-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

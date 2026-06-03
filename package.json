@@ -7,7 +7,8 @@
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite",
     "dev:electron": "tsc -p electron/tsconfig.json && cross-env NODE_ENV=development electron .",
-    "build": "npm run build:vite && npm run build:electron",
+    "build": "npm run build:sync-panel && npm run build:vite && npm run build:electron",
+    "build:sync-panel": "vite build --config sync-panel.vite.config.ts",
     "build:vite": "tsc && vite build",
     "build:electron": "tsc -p electron/tsconfig.json",
     "pack": "npm run build && electron-builder --dir",
@@ -22,8 +23,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "dexie": "^4.4.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-resizable-panels": "^4.11.0",
     "react-window": "^1.8.10"
   },
   "devDependencies": {
@@ -47,6 +50,16 @@
     "files": [
       "dist/**/*",
       "package.json"
+    ],
+    "extraFiles": [
+      {
+        "from": "dist/sync-panel.html",
+        "to": "sync-panel.html"
+      },
+      {
+        "from": "dist/sync-panel-bundle.js",
+        "to": "sync-panel-bundle.js"
+      }
     ],
     "win": {
       "target": [

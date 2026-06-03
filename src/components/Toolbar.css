@@ -2,17 +2,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 4px 16px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  min-height: 48px;
+  min-height: 40px;
+  max-height: 40px;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
 }
 
 .toolbar-left,
 .toolbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.toolbar-left::-webkit-scrollbar,
+.toolbar-right::-webkit-scrollbar {
+  height: 4px;
+}
+
+.toolbar-left::-webkit-scrollbar-track,
+.toolbar-right::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.toolbar-left::-webkit-scrollbar-thumb,
+.toolbar-right::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
 }
 
 .toolbar-center {
@@ -24,15 +49,17 @@
 .toolbar-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 4px;
+  padding: 4px 8px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 11px;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .toolbar-btn:hover {
@@ -45,18 +72,21 @@
 }
 
 .icon {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .file-selector {
-  padding: 8px 12px;
+  padding: 4px 10px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   color: var(--text-primary);
-  font-size: 14px;
-  min-width: 300px;
+  font-size: 12px;
+  min-width: 150px;
+  max-width: 250px;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .file-selector:hover {
@@ -69,10 +99,10 @@
 }
 
 .font-size {
-  padding: 8px 12px;
+  padding: 4px 8px;
   color: var(--text-secondary);
-  font-size: 14px;
-  min-width: 50px;
+  font-size: 12px;
+  min-width: 40px;
   text-align: center;
 }
 
@@ -88,7 +118,7 @@
 }
 
 .theme-btn {
-  padding: 8px 16px;
+  padding: 4px 12px;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -100,6 +130,17 @@
 .theme-btn:hover {
   background: var(--bg-hover);
   border-color: var(--border-hover);
+}
+
+.toolbar-btn.ai {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
+}
+
+.toolbar-btn.ai:hover {
+  background: linear-gradient(135deg, #7b8ff0 0%, #8a5fb3 100%);
+  border-color: #7b8ff0;
 }
 
 .theme-menu {

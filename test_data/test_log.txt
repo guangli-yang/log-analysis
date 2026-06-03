@@ -1,0 +1,421 @@
+[2024-05-22 10:15:30] INFO: System initialized System
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+new job,
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete
+[2024-05-22 10:15:30] INFO: System initialized
+[2024-05-22 10:15:31] INFO: Loading video decoder
+[2024-05-22 10:15:32] DEBUG: Decoder config loaded successfully
+[2024-05-22 10:15:33] INFO: Starting video processing
+[2024-05-22 10:15:35] L42: Video decode failed
+[2024-05-22 10:15:36] WARN: Retrying decode operation
+[2024-05-22 10:15:38] L128: Encoder timeout error
+[2024-05-22 10:15:40] ERROR: Encoding process failed
+[2024-05-22 10:15:42] INFO: Attempting recovery
+[2024-05-22 10:15:45] DEBUG: Network handshake complete
+[2024-05-22 10:15:47] L88: Network send error
+[2024-05-22 10:15:50] WARN: Connection retry in progress
+[2024-05-22 10:15:55] INFO: Audio stream started
+[2024-05-22 10:15:58] L200: Audio buffer underrun
+[2024-05-22 10:16:00] ERROR: Audio playback interrupted
+[2024-05-22 10:16:05] DEBUG: Decoder state: IDLE
+[2024-05-22 10:16:10] L256: Decode buffer overflow
+[2024-05-22 10:16:15] ERROR: Fatal decode error
+[2024-05-22 10:16:20] INFO: Shutdown sequence initiated
+[2024-05-22 10:16:25] INFO: System shutdown complete

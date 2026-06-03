@@ -1,0 +1,23 @@
+{
+  "codeSearchResults": [
+    {
+      "codeFile": {
+        "fileName": "C:\\project\\2\\network.c"
+      },
+      "line": 88,
+      "functionName": "sendData",
+      "matchedPattern": "LOGE错误",
+      "matchedText": "Network send error"
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\project\\1\\audio.cpp"
+      },
+      "line": 200,
+      "functionName": "playAudio",
+      "matchedPattern": "LOGE错误",
+      "matchedText": "Audio buffer underrun"
+    }
+  ],
+  "exportedAt": "2024-05-22T10:00:00.000Z"
+}

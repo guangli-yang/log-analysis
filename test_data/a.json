@@ -1,0 +1,32 @@
+{
+  "codeSearchResults": [
+    {
+      "codeFile": {
+        "fileName": "C:\\xxasdproject\\1265\\main.c"
+      },
+      "line": 42,
+      "functionName": "processVideoFrame",
+      "matchedPattern": "LOGE错误",
+      "matchedText": "Video decode failed"
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\project\\1\\encoder.cpp"
+      },
+      "line": 128,
+      "functionName": "encodeFrame",
+      "matchedPattern": "VIDEO_LOGE错误",
+      "matchedText": "Encoder timeout error"
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\project\\2\\decoder.cpp"
+      },
+      "line": 256,
+      "functionName": "decodeFrame",
+      "matchedPattern": "LOGE错误",
+      "matchedText": "Decode buffer overflow"
+    }
+  ],
+  "exportedAt": "2024-05-22T10:00:00.000Z"
+}

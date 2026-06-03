@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import { SearchOptions, SearchResult } from '../types'
 import './SearchPanel.css'
 
@@ -9,12 +9,17 @@ interface SearchPanelProps {
   onNavigate: (direction: 'next' | 'prev') => void
 }
 
-const SearchPanel: React.FC<SearchPanelProps> = ({
+export interface SearchPanelRef {
+  focus: () => void
+  expand: () => void
+}
+
+const SearchPanel = forwardRef<SearchPanelRef, SearchPanelProps>(({
   onSearch,
   searchResults,
   currentResultIndex,
   onNavigate
-}) => {
+}, ref) => {
   const [query, setQuery] = useState('')
   const [options, setOptions] = useState<SearchOptions>({
     caseSensitive: false,
@@ -22,6 +27,17 @@ const SearchPanel: React.FC<SearchPanelProps> = ({
     useRegex: false
   })
   const [isExpanded, setIsExpanded] = useState(true)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus()
+    },
+    expand: () => {
+      setIsExpanded(true)
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }))
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -44,13 +60,17 @@ const SearchPanel: React.FC<SearchPanelProps> = ({
     <div className={`search-panel ${!isExpanded ? 'collapsed' : ''}`}>
       <div className="search-header" onClick={() => setIsExpanded(!isExpanded)}>
         <span className="search-title">🔍 搜索</span>
-        <span className="toggle-icon">{isExpanded ? '▼' : '▶'}</span>
+        {searchResults.length > 0 && (
+          <span className="result-count">{searchResults.length}</span>
+        )}
+        <span className="toggle-icon">{isExpanded ? '▼' : '▲'}</span>
       </div>
       
       {isExpanded && (
         <div className="search-content">
           <div className="search-input-row">
             <input
+              ref={inputRef}
               type="text"
               className="search-input"
               placeholder="输入搜索内容..."
@@ -120,6 +140,6 @@ const SearchPanel: React.FC<SearchPanelProps> = ({
       )}
     </div>
   )
-}
+})
 
 export default SearchPanel

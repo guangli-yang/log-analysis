@@ -1,55 +1,98 @@
-import React, { useState } from 'react'
-import { LogFile, Theme } from '../types'
+import React from 'react'
+import { LogFile } from '../types'
+import { UserRole } from './RoleSelectionScreen'
 import './Toolbar.css'
 
 interface ToolbarProps {
   onOpenFile: () => void
-  onOpenFolder: () => void
   onShowHistory: () => void
-  onIncreaseFont: () => void
-  onDecreaseFont: () => void
-  onGoToLine: () => void
-  onThemeChange: (theme: Theme) => void
-  theme: Theme
-  fontSize: number
   logFiles: LogFile[]
   currentFileIndex: number
   onFileChange: (index: number) => void
+  onShowSearch: () => void
+  onShowKeywordSettings: () => void
+  onShowAnalysis: () => void
+  onShowAI: () => void
+  onShowCodeSearch: () => void
+  onShowLogMatch: () => void
+  onShowImportDialog: () => void
+  onShowSettings: () => void
+  userRole: UserRole
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
   onOpenFile,
-  onOpenFolder,
   onShowHistory,
-  onIncreaseFont,
-  onDecreaseFont,
-  onGoToLine,
-  onThemeChange,
-  theme,
-  fontSize,
   logFiles,
   currentFileIndex,
-  onFileChange
+  onFileChange,
+  onShowSearch,
+  onShowKeywordSettings,
+  onShowAnalysis,
+  onShowAI,
+  onShowCodeSearch,
+  onShowLogMatch,
+  onShowImportDialog,
+  onShowSettings,
+  userRole
 }) => {
-  const [showThemeMenu, setShowThemeMenu] = useState(false)
+  const isTester = userRole === 'tester'
 
   return (
     <div className="toolbar">
       <div className="toolbar-left">
-        <button className="toolbar-btn" onClick={onOpenFile} title="打开日志文件">
-          <span className="icon">📄</span>
-          打开文件
+        <button className="toolbar-btn" onClick={onShowImportDialog} title="导入配置">
+          <span className="icon">📥</span>
+          导入配置
         </button>
-        <button className="toolbar-btn" onClick={onOpenFolder} title="打开文件夹">
-          <span className="icon">📁</span>
-          打开文件夹
+        <div className="toolbar-divider"></div>
+        <button className="toolbar-btn" onClick={onOpenFile} title="打开Log">
+          <span className="icon">📄</span>
+          打开Log
+        </button>
+        <button className="toolbar-btn" onClick={onShowLogMatch} title="快速分析">
+          <span className="icon">🔗</span>
+          快速分析
         </button>
         <button className="toolbar-btn" onClick={onShowHistory} title="历史记录">
           <span className="icon">⏱️</span>
           历史记录
         </button>
+
+        {!isTester && (
+          <>
+            <div className="toolbar-divider"></div>
+            <button className="toolbar-btn" onClick={onShowKeywordSettings} title="关键词设置">
+              <span className="icon">⚙️</span>
+              关键词设置
+            </button>
+            <button className="toolbar-btn primary" onClick={onShowAnalysis} title="分析工具">
+              <span className="icon">📊</span>
+              分析
+            </button>
+            <button className="toolbar-btn" onClick={onShowCodeSearch} title="代码日志检索">
+              <span className="icon">📄</span>
+              代码日志检索
+            </button>
+            <div className="toolbar-divider"></div>
+            <button className="toolbar-btn ai" onClick={onShowAI} title="AI 智能助手">
+              <span className="icon">🤖</span>
+              AI助手
+            </button>
+            <button className="toolbar-btn" onClick={() => window.electronAPI.openSyncPanel()} title="数据管理">
+              <span className="icon">🔄</span>
+              数据管理
+            </button>
+          </>
+        )}
+
+        <div className="toolbar-divider"></div>
+        <button className="toolbar-btn" onClick={onShowSearch} title="查找 (Ctrl+F)">
+          <span className="icon">🔎</span>
+          查找
+        </button>
       </div>
-      
+
       {logFiles.length > 0 && (
         <div className="toolbar-center">
           <select
@@ -65,51 +108,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </select>
         </div>
       )}
-      
+
       <div className="toolbar-right">
-        <div className="theme-wrapper" style={{ position: 'relative' }}>
-          <button
-            className="toolbar-btn theme-btn"
-            onClick={() => setShowThemeMenu(!showThemeMenu)}
-            title="切换主题"
-          >
-            {theme === 'dark' ? '🌙' : '☀️'} {theme === 'dark' ? '深色' : '浅色'}
-          </button>
-          {showThemeMenu && (
-            <div className="theme-menu">
-              <button
-                className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
-                onClick={() => {
-                  onThemeChange('dark')
-                  setShowThemeMenu(false)
-                }}
-              >
-                🌙 深色主题
-              </button>
-              <button
-                className={`theme-option ${theme === 'light' ? 'active' : ''}`}
-                onClick={() => {
-                  onThemeChange('light')
-                  setShowThemeMenu(false)
-                }}
-              >
-                ☀️ 浅色主题
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="toolbar-divider"></div>
-        <button className="toolbar-btn" onClick={onDecreaseFont} title="减小字体 (Ctrl+-)">
-          <span className="icon">A-</span>
-        </button>
-        <span className="font-size">{fontSize}px</span>
-        <button className="toolbar-btn" onClick={onIncreaseFont} title="增大字体 (Ctrl++)">
-          <span className="icon">A+</span>
-        </button>
-        <div className="toolbar-divider"></div>
-        <button className="toolbar-btn" onClick={onGoToLine} title="跳转至指定行 (Ctrl+G)">
-          <span className="icon">📍</span>
-          跳转行号
+        <button className="toolbar-btn" onClick={onShowSettings} title="软件设置">
+          <span className="icon">⚙️</span>
+          软件设置
         </button>
       </div>
     </div>
