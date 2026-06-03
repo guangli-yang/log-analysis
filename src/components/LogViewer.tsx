@@ -39,6 +39,7 @@ const LogViewer: React.FC<LogViewerProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
+  const scrollerRef = useRef<HTMLElement | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [activeHighlight, setActiveHighlight] = useState<number | undefined>(undefined)
   const [selectedText, setSelectedText] = useState<string>('')
@@ -67,6 +68,41 @@ const LogViewer: React.FC<LogViewerProps> = ({
     Math.ceil((scrollTop + containerHeight) / lineHeight) + BUFFER_SIZE
   )
 
+  const findScrollableAncestor = useCallback((el: HTMLElement | null): HTMLElement | null => {
+    let cur: HTMLElement | null = el
+    while (cur && cur !== document.body) {
+      const cs = window.getComputedStyle(cur)
+      if (cs.overflowY === 'auto' || cs.overflowY === 'scroll' || cs.overflow === 'auto' || cs.overflow === 'scroll') {
+        if (cur.scrollHeight > cur.clientHeight) {
+          return cur
+        }
+      }
+      cur = cur.parentElement
+    }
+    return null
+  }, [])
+
+  useEffect(() => {
+    const inner = containerRef.current
+    if (!inner) return
+    const outer = findScrollableAncestor(inner.parentElement)
+    if (!outer || outer === inner) return
+    scrollerRef.current = outer
+    const onOuterScroll = () => {
+      setScrollTop(outer.scrollTop)
+      setContainerHeight(outer.clientHeight)
+    }
+    setScrollTop(outer.scrollTop)
+    setContainerHeight(outer.clientHeight)
+    outer.addEventListener('scroll', onOuterScroll, { passive: true })
+    const ro = new ResizeObserver(() => setContainerHeight(outer.clientHeight))
+    ro.observe(outer)
+    return () => {
+      outer.removeEventListener('scroll', onOuterScroll)
+      ro.disconnect()
+    }
+  }, [findScrollableAncestor])
+
   const visibleLines = useMemo(() => {
     const result = []
     for (let i = startIndex; i <= endIndex; i++) {
@@ -78,20 +114,6 @@ const LogViewer: React.FC<LogViewerProps> = ({
   const handleScroll = useCallback(() => {
     if (containerRef.current) {
       setScrollTop(containerRef.current.scrollTop)
-    }
-  }, [])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (container) {
-      const observer = new ResizeObserver(entries => {
-        for (const entry of entries) {
-          setContainerHeight(entry.contentRect.height)
-        }
-      })
-      observer.observe(container)
-      setContainerHeight(container.clientHeight)
-      return () => observer.disconnect()
     }
   }, [])
 
@@ -157,15 +179,28 @@ const LogViewer: React.FC<LogViewerProps> = ({
   }, [])
 
   useEffect(() => {
-    if (targetLine !== undefined && containerRef.current) {
-      const container = containerRef.current
-      const containerHeight = container.clientHeight
-      const scrollTop = targetLine * lineHeight - containerHeight / 2
-      container.scrollTo({
-        top: Math.max(0, scrollTop),
-        behavior: 'instant'
-      })
+    if (targetLine === undefined) return
+
+    const scroller = scrollerRef.current || containerRef.current
+    if (!scroller) return
+
+    const scrollerHeight = scroller.clientHeight
+    const maxScroll = Math.max(0, scroller.scrollHeight - scrollerHeight)
+    const targetTop = targetLine * lineHeight
+    const halfViewport = scrollerHeight / 2
+    let scrollTop = targetTop - halfViewport
+    if (scrollTop < 0) {
+      scrollTop = targetTop
     }
+    if (scrollTop > maxScroll) {
+      scrollTop = maxScroll
+    }
+    scroller.scrollTo({
+      top: Math.max(0, scrollTop),
+      behavior: 'instant'
+    })
+
+    setScrollTop(Math.max(0, scrollTop))
   }, [targetLine, lineHeight])
 
   useEffect(() => {

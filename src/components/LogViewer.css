@@ -28,8 +28,8 @@
 }
 
 .log-content {
-  flex: 1;
-  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 0;
   background: var(--bg-primary);
   user-select: text;
   -webkit-user-select: text;
