@@ -896,9 +896,16 @@ function App() {
     logger.info(logCategories.ANALYSIS, '导入代码日志检索结果')
     try {
       const result = await window.electronAPI.importConfig()
-      if (result.success && result.config?.codeSearchResults) {
-        setCodeSearchResults(result.config.codeSearchResults)
-        setNotification(`已导入 ${result.config.codeSearchResults.length} 条检索结果`)
+      if (result.success && result.config) {
+        const config = result.config as any
+        // 支持两种格式：config.codeSearchResults 或 config.data.searchResults
+        const codeSearchResults = config.codeSearchResults || (config.data && config.data.searchResults)
+        if (codeSearchResults && Array.isArray(codeSearchResults)) {
+          setCodeSearchResults(codeSearchResults)
+          setNotification(`已导入 ${codeSearchResults.length} 条检索结果`)
+        } else {
+          setNotification('导入失败或文件无效')
+        }
       } else if (result.reason === 'cancelled') {
       } else {
         setNotification('导入失败或文件无效')
@@ -949,9 +956,11 @@ function App() {
       const result = await window.electronAPI.importConfig()
       if (result.success && result.config) {
         const config = result.config as any
-        if (config.mappings && Array.isArray(config.mappings)) {
-          setModuleMappings(config.mappings)
-          setNotification(`已导入 ${config.mappings.length} 条映射关系`)
+        // 支持两种格式：config.mappings 或 config.data.moduleMappings
+        const mappings = config.mappings || (config.data && config.data.moduleMappings)
+        if (mappings && Array.isArray(mappings)) {
+          setModuleMappings(mappings)
+          setNotification(`已导入 ${mappings.length} 条映射关系`)
         } else {
           setNotification('文件格式无效：缺少 mappings 字段')
         }
