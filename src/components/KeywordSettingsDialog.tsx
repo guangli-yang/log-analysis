@@ -45,6 +45,7 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('errors')
   const [newKeyword, setNewKeyword] = useState('')
   const [newDescription, setNewDescription] = useState('')
+  const [newCodePatternDesc, setNewCodePatternDesc] = useState('')
 
   const [localErrorKeywords, setLocalErrorKeywords] = useState<ErrorKeyword[]>([])
   const [localJobKeywords, setLocalJobKeywords] = useState<JobKeyword[]>([])
@@ -73,9 +74,9 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
     { key: 'errors', label: '错误关键字', icon: '⚠️' },
     { key: 'job', label: '作业关键字', icon: '🔄' },
     { key: 'ignore', label: '忽略关键字', icon: '🚫' },
+    { key: 'codesearch', label: '代码检索', icon: '📄' },
     { key: 'coredump', label: '核心转储关键字', icon: '💥' },
-    { key: 'highlight', label: '高亮设置', icon: '🎨' },
-    { key: 'codesearch', label: '代码检索', icon: '📄' }
+    { key: 'highlight', label: '高亮设置', icon: '🎨' }
   ]
 
   const getCurrentKeywords = () => {
@@ -289,6 +290,33 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
     }
   }
 
+  const handleUpdateKeyword = (index: number, field: 'keyword' | 'description', value: string) => {
+    const update = <T extends { keyword: string; description: string; enabled: boolean }>(
+      prev: T[]
+    ) => prev.map((kw, i) => (i === index ? { ...kw, [field]: value } : kw))
+
+    switch (activeTab) {
+      case 'errors':
+        setLocalErrorKeywords(update(localErrorKeywords))
+        break
+      case 'job':
+        setLocalJobKeywords(update(localJobKeywords))
+        break
+      case 'ignore':
+        setLocalIgnoreKeywords(update(localIgnoreKeywords))
+        break
+      case 'coredump':
+        setLocalCoreDumpKeywords(update(localCoreDumpKeywords))
+        break
+    }
+  }
+
+  const handleUpdatePattern = (index: number, field: 'name' | 'pattern' | 'description', value: string) => {
+    setLocalCodeSearchPatterns(prev =>
+      prev.map((p, i) => (i === index ? { ...p, [field]: value } : p))
+    )
+  }
+
   const handleToggleKeyword = (index: number) => {
     switch (activeTab) {
       case 'errors':
@@ -402,9 +430,24 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
                         setLocalCodeSearchPatterns(newPatterns)
                       }}
                     />
-                    <span className="pattern-name">{pattern.name}</span>
-                    <span className="pattern-pattern">{pattern.pattern}</span>
-                    <span className="pattern-desc">{pattern.description}</span>
+                    <input
+                      className="keyword-input pattern-input"
+                      value={pattern.name}
+                      onChange={(e) => handleUpdatePattern(index, 'name', e.target.value)}
+                      title="模式名称"
+                    />
+                    <input
+                      className="keyword-input pattern-input pattern-regex"
+                      value={pattern.pattern}
+                      onChange={(e) => handleUpdatePattern(index, 'pattern', e.target.value)}
+                      title="正则表达式"
+                    />
+                    <input
+                      className="keyword-input pattern-input pattern-desc-input"
+                      value={pattern.description}
+                      onChange={(e) => handleUpdatePattern(index, 'description', e.target.value)}
+                      title="描述"
+                    />
                     <button
                       className="remove-btn"
                       onClick={() => {
@@ -429,6 +472,12 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
                   value={newDescription}
                   onChange={e => setNewDescription(e.target.value)}
                 />
+                <input
+                  type="text"
+                  placeholder="描述（可选）"
+                  value={newCodePatternDesc}
+                  onChange={e => setNewCodePatternDesc(e.target.value)}
+                />
                 <button
                   className="add-btn"
                   onClick={() => {
@@ -439,12 +488,13 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
                           id: Date.now().toString(),
                           name: newKeyword.trim(),
                           pattern: newDescription.trim(),
-                          description: '',
+                          description: newCodePatternDesc.trim(),
                           enabled: true
                         }
                       ])
                       setNewKeyword('')
                       setNewDescription('')
+                      setNewCodePatternDesc('')
                     }
                   }}
                 >
@@ -475,8 +525,18 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
                       checked={item.enabled}
                       onChange={() => handleToggleKeyword(index)}
                     />
-                    <span className="keyword-text">{item.keyword}</span>
-                    <span className="keyword-desc">{item.description}</span>
+                    <input
+                      className="keyword-input keyword-text-input"
+                      value={item.keyword}
+                      onChange={(e) => handleUpdateKeyword(index, 'keyword', e.target.value)}
+                      title="关键词"
+                    />
+                    <input
+                      className="keyword-input keyword-desc-input"
+                      value={item.description}
+                      onChange={(e) => handleUpdateKeyword(index, 'description', e.target.value)}
+                      title="描述"
+                    />
                     <button className="remove-btn" onClick={() => handleRemoveKeyword(index)}>
                       删除
                     </button>

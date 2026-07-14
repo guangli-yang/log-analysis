@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import './HistoryPanel.css'
 
 interface HistoryPanelProps {
@@ -14,6 +14,17 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   onClear,
   onClose
 }) => {
+  const [closing, setClosing] = useState(false)
+
+  const handleClose = useCallback(() => {
+    if (closing) return
+    setClosing(true)
+    setTimeout(() => {
+      setClosing(false)
+      onClose()
+    }, 200)
+  }, [closing, onClose])
+
   const getFileName = (path: string) => {
     const parts = path.split(/[/\\]/)
     return parts[parts.length - 1]
@@ -25,7 +36,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   }
 
   return (
-    <div className="history-panel">
+    <div className={`history-panel ${closing ? 'closing' : ''}`}>
       <div className="history-header">
         <h3>历史记录</h3>
         <div className="history-actions">
@@ -34,7 +45,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
               清空
             </button>
           )}
-          <button className="close-btn" onClick={onClose}>
+          <button className="close-btn" onClick={handleClose}>
             ×
           </button>
         </div>

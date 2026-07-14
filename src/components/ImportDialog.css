@@ -12,6 +12,14 @@
   animation: fadeIn var(--transition-normal) ease-out;
 }
 
+.dialog-overlay.closing {
+  animation: fadeOut var(--transition-normal) ease-in forwards;
+}
+
+.import-dialog.closing {
+  animation: scaleOut var(--transition-normal) ease-in forwards;
+}
+
 .import-dialog {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -60,10 +68,76 @@
   margin: 0 0 16px 0;
 }
 
+.import-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.import-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.import-project-input {
+  padding: 8px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.import-project-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.import-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.import-mode-group {
+  display: flex;
+  gap: 8px;
+}
+
+.import-mode-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.import-mode-item.active {
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
 .import-options {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.import-option-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.import-option-btn:disabled:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
 }
 
 .import-option-btn {

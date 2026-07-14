@@ -13,6 +13,10 @@
   animation: scaleIn var(--transition-normal) ease-out;
 }
 
+.analysis-panel.closing {
+  animation: scaleOut var(--transition-normal) ease-in forwards;
+}
+
 .analysis-header {
   display: flex;
   justify-content: space-between;

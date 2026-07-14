@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import { CodeSearchResult, ModuleLog, MatchSummary, MatchResult, ModuleMapping } from '../types'
 import './AnalysisPanel.css'
 
@@ -26,8 +26,18 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const [position, setPosition] = useState({ x: window.innerWidth - 470, y: 120 })
   const [isDragging, setIsDragging] = useState(false)
+  const [closing, setClosing] = useState(false)
   const dragOffset = useRef({ x: 0, y: 0 })
   const panelRef = useRef<HTMLDivElement>(null)
+
+  const handleClose = useCallback(() => {
+    if (closing) return
+    setClosing(true)
+    setTimeout(() => {
+      setClosing(false)
+      onClose()
+    }, 200)
+  }, [closing, onClose])
 
   const handleToggleModule = (id: string) => {
     setSelectedModuleIds(prev =>
@@ -72,10 +82,11 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
 
       if (codeSearchResults.length === 0) return
 
-      const allPatterns: Array<{ line: number; staticStr: string; codePath: string }> = codeSearchResults.map(r => ({
+      const allPatterns: Array<{ line: number; staticStr: string; codePath: string; keywords: string[] }> = codeSearchResults.map(r => ({
         line: r.line,
         staticStr: r.matchedText || '',
-        codePath: r.codeFile?.fileName || ''
+        codePath: r.codeFile?.fileName || '',
+        keywords: r.keywords || []
       }))
 
       if (allPatterns.length > 0) {
@@ -87,11 +98,29 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
             const mainSourceLine = parseInt(mainMatch[1], 10)
             const mainContent = mainMatch[2].trim()
 
-            const matchedPattern = allPatterns.find(p =>
-              p.line === mainSourceLine &&
-              p.staticStr.length > 0 &&
-              mainContent.toLowerCase().includes(p.staticStr.toLowerCase())
-            )
+            const matchedPattern = allPatterns.find(p => {
+              if (p.line !== mainSourceLine) return false
+
+              // 优先使用关键词匹配（新数据）
+              let kwList = p.keywords || []
+
+              // 兼容旧数据：如果没有关键词，从 staticStr 动态提取
+              if (kwList.length === 0 && p.staticStr) {
+                kwList = p.staticStr
+                  .replace(/\s+/g, ' ')
+                  .trim()
+                  .split(/\s+/)
+                  .filter(k => k.length > 0)
+              }
+
+              if (kwList.length > 0) {
+                const lowerContent = mainContent.toLowerCase()
+                return kwList.every(kw => lowerContent.includes(kw.toLowerCase()))
+              }
+
+              // 最后兜底：staticStr 为空也不匹配
+              return false
+            })
 
             if (matchedPattern) {
               matchedLines.push({
@@ -147,16 +176,20 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
     }
 
     const mappingContactInfo: Array<{ moduleName: string; contactName: string }> = []
-    const usedMappings = new Set<string>()
+    const seenContactInfo = new Set<string>()
     matchedCodePaths.forEach(codePath => {
-      const mapping = moduleMappings.find(m => isPathSegmentMatch(codePath, m.codePath))
-      if (mapping && !usedMappings.has(mapping.codePath)) {
-        usedMappings.add(mapping.codePath)
-        mappingContactInfo.push({
-          moduleName: mapping.moduleName,
-          contactName: mapping.contactName
-        })
-      }
+      // 获取所有匹配的映射（不再只取第一个）
+      const matchedMappings = moduleMappings.filter(m => isPathSegmentMatch(codePath, m.codePath))
+      matchedMappings.forEach(mapping => {
+        const key = `${mapping.contactName}-${mapping.moduleName}`
+        if (!seenContactInfo.has(key)) {
+          seenContactInfo.add(key)
+          mappingContactInfo.push({
+            moduleName: mapping.moduleName,
+            contactName: mapping.contactName
+          })
+        }
+      })
     })
 
     if (mappingContactInfo.length === 0) {
@@ -301,13 +334,13 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
   return (
     <div
       ref={panelRef}
-      className="analysis-panel"
+      className={`analysis-panel ${closing ? 'closing' : ''}`}
       style={{ left: position.x, top: position.y }}
       onMouseDown={handleMouseDown}
     >
       <div className="analysis-header">
         <span className="analysis-title">🔗 快速分析</span>
-        <button className="close-btn" onClick={onClose}>×</button>
+        <button className="close-btn" onClick={handleClose}>×</button>
       </div>
 
       <div className="analysis-content">

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, Menu, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -467,9 +467,18 @@ function extractPrintStaticString(line: string): string {
       .replace(/\\t/g, ' ')
       .replace(/\\r/g, '')
       .replace(/\{[^}]+\}/g, '')
+      .replace(/\s+/g, ' ')
       .trim()
   }
   return line.trim()
+}
+
+function extractKeywords(staticStr: string): string[] {
+  if (!staticStr || staticStr.length === 0) return []
+  return staticStr
+    .split(/\s+/)
+    .filter(kw => kw.length > 0)
+    .map(kw => kw.trim())
 }
 
 async function processFile(
@@ -481,6 +490,7 @@ async function processFile(
   functionName: string
   matchedPattern: string
   matchedText: string
+  keywords: string[]
 }>> {
   const results: Array<{
     fileName: string
@@ -488,6 +498,7 @@ async function processFile(
     functionName: string
     matchedPattern: string
     matchedText: string
+    keywords: string[]
   }> = []
   
   try {
@@ -506,12 +517,14 @@ async function processFile(
       for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
         const line = lines[lineIndex]
         if (regex.test(line)) {
+          const staticStr = extractPrintStaticString(line)
           results.push({
             fileName: fullPath,
             line: lineIndex + 1,
             functionName: getFunctionName(line, content, lineIndex),
             matchedPattern: patternInfo.name,
-            matchedText: extractPrintStaticString(line)
+            matchedText: staticStr,
+            keywords: extractKeywords(staticStr)
           })
         }
       }
@@ -538,6 +551,7 @@ ipcMain.handle('select-code-folder', async (_, patterns: Array<{ pattern: string
       functionName: string
       matchedPattern: string
       matchedText: string
+      keywords: string[]
     }> = []
 
     const filePaths: string[] = []
@@ -643,10 +657,341 @@ ipcMain.handle('ai-test-connection', async (_, { apiUrl, apiKey, modelName }: { 
   }
 })
 
-ipcMain.handle('open-sync-panel', async () => {
-  const isDev = process.env.NODE_ENV === 'development'
-  const syncPanelPath = isDev
-    ? path.join(__dirname, '..', '..', 'sync-panel.html')
-    : path.join(path.dirname(app.getPath('exe')), 'sync-panel.html')
-  await shell.openPath(syncPanelPath)
+// 获取软件同级目录的 config 文件夹路径
+function getAppConfigPath(): string {
+  return path.join(path.dirname(app.getPath('exe')), 'config')
+}
+
+// 自动加载默认配置文件（支持多项目）
+ipcMain.handle('auto-load-config', async () => {
+  // 开发模式下跳过自动加载
+  if (process.env.NODE_ENV === 'development') {
+    console.log('开发模式，跳过自动加载配置文件')
+    return { success: false, reason: 'development_mode' }
+  }
+  
+  const configBasePath = getAppConfigPath()
+  
+  const result = {
+    success: false,
+    projects: [] as { name: string; codeSearch: any; moduleMapping: any }[]
+  }
+  
+  try {
+    // 检查 config 目录
+    if (!fs.existsSync(configBasePath)) {
+      console.log('未找到配置文件目录，跳过自动加载')
+      return result
+    }
+    
+    // 遍历 config 下的所有子目录作为项目
+    const entries = fs.readdirSync(configBasePath, { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      
+      const projectName = entry.name
+      const projectPath = path.join(configBasePath, projectName)
+      const codeSearchPath = path.join(projectPath, 'code-search')
+      const moduleMappingPath = path.join(projectPath, 'module-mapping')
+      
+      const projectData: { name: string; codeSearch: any; moduleMapping: any } = {
+        name: projectName,
+        codeSearch: null,
+        moduleMapping: null
+      }
+      
+      // 检查 code-search 目录
+      if (fs.existsSync(codeSearchPath)) {
+        const files = fs.readdirSync(codeSearchPath).filter(f => f.endsWith('.json'))
+        if (files.length > 0) {
+          const filePath = path.join(codeSearchPath, files[0])
+          const content = fs.readFileSync(filePath, 'utf-8')
+          const config = JSON.parse(content)
+          console.log(`自动加载代码搜索配置成功 [${projectName}]: ${filePath}`)
+          projectData.codeSearch = config
+        }
+      }
+      
+      // 检查 module-mapping 目录
+      if (fs.existsSync(moduleMappingPath)) {
+        const files = fs.readdirSync(moduleMappingPath).filter(f => f.endsWith('.json'))
+        if (files.length > 0) {
+          const filePath = path.join(moduleMappingPath, files[0])
+          const content = fs.readFileSync(filePath, 'utf-8')
+          const config = JSON.parse(content)
+          console.log(`自动加载模块映射配置成功 [${projectName}]: ${filePath}`)
+          projectData.moduleMapping = config
+        }
+      }
+      
+      // 只有项目下有配置才添加
+      if (projectData.codeSearch !== null || projectData.moduleMapping !== null) {
+        result.projects.push(projectData)
+      }
+    }
+    
+    result.success = result.projects.length > 0
+    
+    if (!result.success) {
+      console.log('未找到任何项目的配置文件，跳过自动加载')
+    } else {
+      console.log(`自动加载了 ${result.projects.length} 个项目的配置`)
+    }
+    
+    return result
+  } catch (err) {
+    console.error('自动加载配置文件失败:', err)
+    return { success: false, projects: [], reason: 'error', error: String(err) }
+  }
+})
+
+// 获取项目列表
+ipcMain.handle('get-config-projects', async () => {
+  if (process.env.NODE_ENV === 'development') {
+    return { success: false, projects: [] }
+  }
+  
+  const configBasePath = getAppConfigPath()
+  
+  try {
+    if (!fs.existsSync(configBasePath)) {
+      return { success: true, projects: [] }
+    }
+    
+    const entries = fs.readdirSync(configBasePath, { withFileTypes: true })
+    const projects = entries
+      .filter(e => e.isDirectory())
+      .map(e => e.name)
+      .filter(name => !name.startsWith('.'))
+    
+    return { success: true, projects }
+  } catch (err) {
+    console.error('获取项目列表失败:', err)
+    return { success: false, projects: [], error: String(err) }
+  }
+})
+
+// ========== 项目级配置读写（config/<项目>/code-search|module-mapping） ==========
+
+// 项目配置根目录：开发模式用工作区 config，生产模式用 exe 同级 config
+function getProjectsBasePath(): string {
+  if (process.env.NODE_ENV === 'development') {
+    return path.join(process.cwd(), 'config')
+  }
+  return path.join(path.dirname(app.getPath('exe')), 'config')
+}
+
+// 目录保留名（非项目）
+const RESERVED_DIR_NAMES = ['code-search', 'module-mapping']
+
+function sanitizeName(name: string): string {
+  return String(name || '').replace(/[\\/:*?"<>|]/g, '_').trim()
+}
+
+function ensureDir(dir: string): void {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
+  }
+}
+
+// 从解析后的 JSON 中提取代码日志数组
+function extractCodeArray(parsed: any): any[] | null {
+  if (Array.isArray(parsed)) return parsed
+  if (parsed && Array.isArray(parsed.codeSearchResults)) return parsed.codeSearchResults
+  if (parsed && parsed.data && Array.isArray(parsed.data.searchResults)) return parsed.data.searchResults
+  return null
+}
+
+// 从解析后的 JSON 中提取模块映射数组
+function extractMappingArray(parsed: any): any[] | null {
+  if (Array.isArray(parsed)) return parsed
+  if (parsed && Array.isArray(parsed.mappings)) return parsed.mappings
+  if (parsed && parsed.data && Array.isArray(parsed.data.moduleMappings)) return parsed.data.moduleMappings
+  return null
+}
+
+// 列出所有项目
+ipcMain.handle('list-projects', async () => {
+  const base = getProjectsBasePath()
+  try {
+    if (!fs.existsSync(base)) return { success: true, projects: [] }
+    const entries = fs.readdirSync(base, { withFileTypes: true })
+    const projects = entries
+      .filter(e => e.isDirectory())
+      .map(e => e.name)
+      .filter(name => !name.startsWith('.') && !RESERVED_DIR_NAMES.includes(name))
+    return { success: true, projects }
+  } catch (err) {
+    console.error('列出项目失败:', err)
+    return { success: false, projects: [], error: String(err) }
+  }
+})
+
+// 创建项目
+ipcMain.handle('create-project', async (_, name: string) => {
+  const clean = sanitizeName(name)
+  if (!clean) return { success: false, error: '项目名称无效' }
+  if (RESERVED_DIR_NAMES.includes(clean)) return { success: false, error: '项目名称为保留字，请更换' }
+  const projectPath = path.join(getProjectsBasePath(), clean)
+  try {
+    if (fs.existsSync(projectPath)) return { success: false, error: '项目已存在' }
+    ensureDir(path.join(projectPath, 'code-search'))
+    ensureDir(path.join(projectPath, 'module-mapping'))
+    return { success: true, name: clean }
+  } catch (err) {
+    console.error('创建项目失败:', err)
+    return { success: false, error: String(err) }
+  }
+})
+
+// 删除项目
+ipcMain.handle('delete-project', async (_, name: string) => {
+  const clean = sanitizeName(name)
+  const projectPath = path.join(getProjectsBasePath(), clean)
+  try {
+    if (fs.existsSync(projectPath)) {
+      fs.rmSync(projectPath, { recursive: true, force: true })
+    }
+    return { success: true }
+  } catch (err) {
+    console.error('删除项目失败:', err)
+    return { success: false, error: String(err) }
+  }
+})
+
+// 重命名项目
+ipcMain.handle('rename-project', async (_, oldName: string, newName: string) => {
+  const from = path.join(getProjectsBasePath(), sanitizeName(oldName))
+  const clean = sanitizeName(newName)
+  if (!clean) return { success: false, error: '项目名称无效' }
+  if (RESERVED_DIR_NAMES.includes(clean)) return { success: false, error: '项目名称为保留字，请更换' }
+  const to = path.join(getProjectsBasePath(), clean)
+  try {
+    if (!fs.existsSync(from)) return { success: false, error: '项目不存在' }
+    if (fs.existsSync(to)) return { success: false, error: '目标项目已存在' }
+    fs.renameSync(from, to)
+    return { success: true, name: clean }
+  } catch (err) {
+    console.error('重命名项目失败:', err)
+    return { success: false, error: String(err) }
+  }
+})
+
+// 加载某个项目的模块数据（模块日志 + 模块负责人表）
+ipcMain.handle('load-project-data', async (_, name: string) => {
+  const clean = sanitizeName(name)
+  const projectPath = path.join(getProjectsBasePath(), clean)
+  const codeSearchPath = path.join(projectPath, 'code-search')
+  const moduleMappingPath = path.join(projectPath, 'module-mapping')
+
+  const moduleLogs: any[] = []
+  const moduleMappings: any[] = []
+
+  try {
+    // 读取模块日志（code-search 下每个 json 视为一个模块日志）
+    if (fs.existsSync(codeSearchPath)) {
+      const files = fs.readdirSync(codeSearchPath).filter(f => f.endsWith('.json'))
+      for (const file of files) {
+        const full = path.join(codeSearchPath, file)
+        try {
+          const content = fs.readFileSync(full, 'utf-8')
+          const parsed = JSON.parse(content)
+          const arr = extractCodeArray(parsed)
+          if (!arr) continue // 跳过模板/无效文件
+          const stat = fs.statSync(full)
+          moduleLogs.push({
+            id: `module_${path.basename(file, '.json')}`,
+            name: path.basename(file, '.json'),
+            filePath: full,
+            content: JSON.stringify(arr),
+            lineCount: arr.length,
+            importedAt: Math.floor(stat.mtimeMs)
+          })
+        } catch (e) {
+          console.error(`解析模块日志失败 ${full}:`, e)
+        }
+      }
+    }
+
+    // 读取模块负责人表（module-mapping 下所有 json 合并）
+    if (fs.existsSync(moduleMappingPath)) {
+      const files = fs.readdirSync(moduleMappingPath).filter(f => f.endsWith('.json'))
+      for (const file of files) {
+        const full = path.join(moduleMappingPath, file)
+        try {
+          const content = fs.readFileSync(full, 'utf-8')
+          const parsed = JSON.parse(content)
+          const arr = extractMappingArray(parsed)
+          if (!arr) continue
+          for (const m of arr) {
+            if (m && (m.codePath !== undefined || m.moduleName !== undefined)) {
+              moduleMappings.push({
+                codePath: m.codePath || '',
+                moduleName: m.moduleName || '',
+                contactName: m.contactName || ''
+              })
+            }
+          }
+        } catch (e) {
+          console.error(`解析模块映射失败 ${full}:`, e)
+        }
+      }
+    }
+
+    return { success: true, moduleLogs, moduleMappings }
+  } catch (err) {
+    console.error('加载项目数据失败:', err)
+    return { success: false, moduleLogs: [], moduleMappings: [], error: String(err) }
+  }
+})
+
+// 保存某个项目的模块数据
+ipcMain.handle('save-project-data', async (_, name: string, data: { moduleLogs?: any[]; moduleMappings?: any[] }) => {
+  const clean = sanitizeName(name)
+  if (!clean) return { success: false, error: '项目名称无效' }
+  const projectPath = path.join(getProjectsBasePath(), clean)
+  const codeSearchPath = path.join(projectPath, 'code-search')
+  const moduleMappingPath = path.join(projectPath, 'module-mapping')
+
+  try {
+    ensureDir(codeSearchPath)
+    ensureDir(moduleMappingPath)
+
+    // 重写 code-search：清理旧 json，再按模块日志逐个写入
+    for (const f of fs.readdirSync(codeSearchPath).filter(f => f.endsWith('.json'))) {
+      fs.unlinkSync(path.join(codeSearchPath, f))
+    }
+    const usedNames = new Set<string>()
+    for (const log of data.moduleLogs || []) {
+      const baseName = (sanitizeName(log.name || 'module').replace(/\.json$/i, '')) || 'module'
+      let fileName = baseName
+      let i = 1
+      while (usedNames.has(fileName.toLowerCase())) {
+        fileName = `${baseName}_${i++}`
+      }
+      usedNames.add(fileName.toLowerCase())
+      let toWrite = log.content || '[]'
+      try {
+        toWrite = JSON.stringify(JSON.parse(log.content), null, 2)
+      } catch {
+        // 保留原始内容
+      }
+      fs.writeFileSync(path.join(codeSearchPath, `${fileName}.json`), toWrite, 'utf-8')
+    }
+
+    // 重写 module-mapping：统一写入单文件 mappings.json
+    for (const f of fs.readdirSync(moduleMappingPath).filter(f => f.endsWith('.json'))) {
+      fs.unlinkSync(path.join(moduleMappingPath, f))
+    }
+    fs.writeFileSync(
+      path.join(moduleMappingPath, 'mappings.json'),
+      JSON.stringify({ version: '2.0', mappings: data.moduleMappings || [] }, null, 2),
+      'utf-8'
+    )
+
+    return { success: true }
+  } catch (err) {
+    console.error('保存项目数据失败:', err)
+    return { success: false, error: String(err) }
+  }
 })

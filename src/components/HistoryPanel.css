@@ -8,6 +8,10 @@
   animation: slideInLeft var(--transition-normal) ease-out;
 }
 
+.history-panel.closing {
+  animation: slideOutLeft var(--transition-normal) ease-in forwards;
+}
+
 .history-header {
   display: flex;
   justify-content: space-between;

@@ -1,0 +1,8 @@
+{
+  "version": "2.0",
+  "mappings": [
+    { "codePath": "project\\1", "moduleName": "打印模块", "contactName": "张三" },
+    { "codePath": "project\\2", "moduleName": "网络模块", "contactName": "李四" },
+    { "codePath": "project\\3", "moduleName": "解码模块", "contactName": "赵六" }
+  ]
+}

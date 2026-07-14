@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import { ErrorKeyword, CoreDumpKeyword, IgnoreKeyword } from '../types'
 import { logger, logCategories } from '../utils/logger'
 import './AnalysisPanel.css'
@@ -39,7 +39,17 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [showGdbHelp, setShowGdbHelp] = useState(false)
   const [position, setPosition] = useState({ x: window.innerWidth - 470, y: 120 })
   const [isDragging, setIsDragging] = useState(false)
+  const [closing, setClosing] = useState(false)
   const dragOffset = useRef({ x: 0, y: 0 })
+
+  const handleClose = useCallback(() => {
+    if (closing) return
+    setClosing(true)
+    setTimeout(() => {
+      setClosing(false)
+      onClose()
+    }, 200)
+  }, [closing, onClose])
   const panelRef = useRef<HTMLDivElement>(null)
 
   const handleFilterKeywords = () => {
@@ -199,13 +209,13 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   return (
     <div
       ref={panelRef}
-      className="analysis-panel"
+      className={`analysis-panel ${closing ? 'closing' : ''}`}
       style={{ left: position.x, top: position.y }}
       onMouseDown={handleMouseDown}
     >
       <div className="analysis-header">
         <span className="analysis-title">📊 分析工具</span>
-        <button className="close-btn" onClick={onClose}>×</button>
+        <button className="close-btn" onClick={handleClose}>×</button>
       </div>
 
       <div className="analysis-tabs-header">

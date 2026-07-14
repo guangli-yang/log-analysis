@@ -149,6 +149,39 @@
   color: var(--text-secondary);
 }
 
+.keyword-input {
+  flex: 1;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 4px 6px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.keyword-input:hover {
+  border-color: var(--border-color);
+}
+
+.keyword-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  background: var(--bg-tertiary);
+}
+
+.keyword-text-input {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.keyword-desc-input {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
 .remove-btn {
   background: var(--warning-color);
   color: white;
@@ -340,4 +373,13 @@
 
 .import-dialog .cancel-btn {
   width: 100%;
+}
+
+/* 代码检索模式可编辑输入框 */
+.pattern-input {
+  font-size: 12px;
+}
+
+.pattern-regex {
+  font-family: monospace;
 }

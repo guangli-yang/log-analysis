@@ -101,6 +101,7 @@ export interface CodeSearchResult {
   functionName: string
   matchedPattern: string
   matchedText: string
+  keywords?: string[]
 }
 
 export interface LogCodeMatch {
@@ -145,6 +146,7 @@ export interface CodeSearchResultItem {
   functionName: string
   matchedPattern: string
   matchedText: string
+  keywords?: string[]
 }
 
 export interface AppConfig {
@@ -168,6 +170,11 @@ export interface ModuleMapping {
 export interface ModuleMappingConfig {
   version: string
   mappings: ModuleMapping[]
+}
+
+export interface ProjectData {
+  moduleLogs: ModuleLog[]
+  moduleMappings: ModuleMapping[]
 }
 
 export type Theme = 'dark' | 'light'

@@ -108,6 +108,28 @@
   }
 }
 
+@keyframes slideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
 @keyframes slideInDown {
   from {
     transform: translateY(-100%);
@@ -289,16 +311,179 @@
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
+  padding: 40px 20px;
+  background: var(--bg-primary);
 }
 
-.welcome-screen h1 {
-  font-size: 24px;
-  margin-bottom: 16px;
+.welcome-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 520px;
+  width: 100%;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.welcome-icon {
+  font-size: 48px;
+  line-height: 1;
+  animation: fadeInUp 0.4s ease-out 0.05s both;
+}
+
+.welcome-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  animation: fadeInUp 0.4s ease-out 0.1s both;
+}
+
+.welcome-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  animation: fadeInUp 0.4s ease-out 0.15s both;
+}
+
+/* 拖放区域 */
+.welcome-dropzone {
+  width: 100%;
+  padding: 40px 20px;
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s;
+  animation: fadeInUp 0.4s ease-out 0.2s both;
+}
+
+.welcome-dropzone:hover,
+.welcome-dropzone.active {
+  border-color: var(--accent-color);
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.06);
+}
+
+.welcome-dropzone.active {
+  border-style: solid;
+  background: rgba(var(--accent-rgb, 59, 130, 246), 0.1);
+  transform: scale(1.02);
+}
+
+.welcome-dropzone-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.welcome-dropzone-text {
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.welcome-dropzone-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 操作按钮 */
+.welcome-actions {
+  display: flex;
+  gap: 12px;
+  animation: fadeInUp 0.4s ease-out 0.25s both;
+}
+
+.welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.welcome-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+}
+
+.welcome-btn.primary {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #fff;
+  font-weight: 500;
+}
+
+.welcome-btn.primary:hover {
+  opacity: 0.9;
+}
+
+.welcome-btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* 最近文件 */
+.welcome-recent {
+  width: 100%;
+  animation: fadeInUp 0.4s ease-out 0.3s both;
+}
+
+.welcome-recent-title {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.welcome-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.welcome-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.welcome-recent-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
   color: var(--text-primary);
 }
 
-.welcome-screen p {
-  font-size: 14px;
+/* 提示 */
+.welcome-tips {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  animation: fadeInUp 0.4s ease-out 0.35s both;
 }
 
 .app-status-bar {

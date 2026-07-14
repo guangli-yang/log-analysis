@@ -16,6 +16,7 @@ import KeywordSettingsDialog from './components/KeywordSettingsDialog'
 import AIDialog from './components/AIDialog'
 import LogExtractDialog from './components/LogExtractDialog'
 import ImportDialog from './components/ImportDialog'
+import DataManagementPanel from './components/DataManagementPanel'
 import RoleSelectionScreen, { UserRole } from './components/RoleSelectionScreen'
 import SettingsDialog from './components/SettingsDialog'
 import ContextMenu from './components/ContextMenu'
@@ -122,6 +123,10 @@ function App() {
   const [codeSearchResults, setCodeSearchResults] = useState<CodeSearchResult[]>([])
   const [moduleLogs, setModuleLogs] = useState<ModuleLog[]>([])
   const [moduleMappings, setModuleMappings] = useState<ModuleMapping[]>([])
+  const [projectList, setProjectList] = useState<string[]>([])
+  const [activeProject, setActiveProject] = useState<string>('')
+  const [projectSystemReady, setProjectSystemReady] = useState(false)
+  const [showDataManagement, setShowDataManagement] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([])
   const [searchTags, setSearchTags] = useState<SearchTag[]>([])
@@ -168,9 +173,6 @@ function App() {
           if (config.aiConfig) {
             setAIConfig(config.aiConfig)
           }
-          if (config.moduleLogs && config.moduleLogs.length > 0) {
-            setModuleLogs(config.moduleLogs)
-          }
         }
         setConfigLoaded(true)
       } catch (err) {
@@ -208,8 +210,7 @@ function App() {
           highlightConfig,
           searchTags,
           aiConfig,
-          codeSearchResults,
-          moduleLogs
+          codeSearchResults
         }
         await window.electronAPI.saveConfig(config)
       } catch (err) {
@@ -217,9 +218,95 @@ function App() {
       }
     }
     saveConfig()
-  }, [errorKeywords, jobKeywords, ignoreKeywords, coreDumpKeywords, highlightConfig, searchTags, configLoaded, aiConfig, codeSearchResults, moduleLogs])
+  }, [errorKeywords, jobKeywords, ignoreKeywords, coreDumpKeywords, highlightConfig, searchTags, configLoaded, aiConfig, codeSearchResults])
 
   const debounceRef = useRef<number | null>(null)
+  const loadingProjectRef = useRef(false)
+
+  // ========== 项目级模块数据：加载 / 切换 / 持久化 ==========
+  const switchProject = useCallback(async (name: string) => {
+    if (!name) return
+    loadingProjectRef.current = true
+    try {
+      const data = await window.electronAPI.loadProjectData(name)
+      setModuleLogs(data?.moduleLogs || [])
+      setModuleMappings(data?.moduleMappings || [])
+      setActiveProject(name)
+      localStorage.setItem('activeProject', name)
+    } catch (err) {
+      console.error('切换项目失败:', err)
+    } finally {
+      setTimeout(() => { loadingProjectRef.current = false }, 0)
+    }
+  }, [])
+
+  useEffect(() => {
+    const initProjects = async () => {
+      try {
+        const res = await window.electronAPI.listProjects()
+        const projects = res?.projects || []
+        setProjectList(projects)
+        const saved = localStorage.getItem('activeProject') || ''
+        const initial = projects.includes(saved) ? saved : (projects[0] || '')
+        if (initial) {
+          await switchProject(initial)
+        }
+      } catch (err) {
+        console.error('初始化项目失败:', err)
+      } finally {
+        setProjectSystemReady(true)
+      }
+    }
+    initProjects()
+  }, [switchProject])
+
+  useEffect(() => {
+    if (!projectSystemReady) return
+    if (!activeProject) return
+    if (loadingProjectRef.current) return
+    const timer = setTimeout(() => {
+      window.electronAPI.saveProjectData(activeProject, { moduleLogs, moduleMappings })
+        .catch(err => console.error('保存项目数据失败:', err))
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [moduleLogs, moduleMappings, activeProject, projectSystemReady])
+
+  const handleCreateProject = useCallback(async (name: string) => {
+    const clean = (name || '').trim()
+    if (!clean) return
+    const res = await window.electronAPI.createProject(clean)
+    if (res.success) {
+      const finalName = res.name || clean
+      setProjectList(prev => (prev.includes(finalName) ? prev : [...prev, finalName]))
+      await switchProject(finalName)
+      setNotification(`已创建并切换到项目：${finalName}`)
+    } else {
+      setNotification(res.error || '创建项目失败')
+    }
+  }, [switchProject])
+
+  const handleDeleteProject = useCallback(async (name: string) => {
+    const res = await window.electronAPI.deleteProject(name)
+    if (res.success) {
+      const remaining = projectList.filter(p => p !== name)
+      setProjectList(remaining)
+      if (activeProject === name) {
+        if (remaining.length > 0) {
+          await switchProject(remaining[0])
+        } else {
+          loadingProjectRef.current = true
+          setActiveProject('')
+          localStorage.removeItem('activeProject')
+          setModuleLogs([])
+          setModuleMappings([])
+          setTimeout(() => { loadingProjectRef.current = false }, 0)
+        }
+      }
+      setNotification(`已删除项目：${name}`)
+    } else {
+      setNotification(res.error || '删除项目失败')
+    }
+  }, [projectList, activeProject, switchProject])
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('logHistory')
@@ -382,7 +469,8 @@ function App() {
           line: r.line,
           functionName: r.functionName,
           matchedPattern: r.matchedPattern,
-          matchedText: r.matchedText
+          matchedText: r.matchedText,
+          keywords: r.keywords || []
         }))
         setCodeSearchResults(results)
       } else {
@@ -916,33 +1004,69 @@ function App() {
     }
   }, [])
 
-  const handleImportModuleLog = useCallback(async () => {
-    logger.info(logCategories.ANALYSIS, '导入模块日志')
+  // 确保项目存在（不存在则创建），返回可用的项目名
+  const ensureProject = useCallback(async (projectName: string): Promise<string | null> => {
+    const clean = (projectName || '').trim()
+    if (!clean) {
+      setNotification('请先输入项目名称')
+      return null
+    }
+    if (projectList.includes(clean)) return clean
+    const res = await window.electronAPI.createProject(clean)
+    if (!res.success) {
+      setNotification(res.error || '创建项目失败')
+      return null
+    }
+    const finalName = res.name || clean
+    setProjectList(prev => (prev.includes(finalName) ? prev : [...prev, finalName]))
+    return finalName
+  }, [projectList])
+
+  const handleImportModuleLog = useCallback(async (projectName: string, mode: 'overwrite' | 'merge') => {
+    logger.info(logCategories.ANALYSIS, '导入模块日志', `项目: ${projectName}, 模式: ${mode}`)
     try {
+      const target = await ensureProject(projectName)
+      if (!target) return
       const results = await window.electronAPI.selectImportConfig()
-      if (results && results.length > 0) {
-        const newModules: ModuleLog[] = results.map((fileResult) => {
-          const fileName = fileResult.fileName || fileResult.filePath.split(/[\\/]/).pop() || '未知模块'
-          const content = fileResult.content || ''
-          const lines = content.split('\n')
-          return {
-            id: `module_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            name: fileName,
-            filePath: fileResult.filePath,
-            content: content,
-            lineCount: lines.length,
-            importedAt: Date.now()
-          }
-        })
-        setModuleLogs(prev => [...prev, ...newModules])
-        const count = newModules.length
-        setNotification(`已导入 ${count} 个配置: ${newModules.map(m => m.name).join(', ')}`)
-      }
+      if (!results || results.length === 0) return
+
+      const newModules: ModuleLog[] = results.map((fileResult) => {
+        const rawName = fileResult.fileName || fileResult.filePath.split(/[\\/]/).pop() || '未知模块'
+        const name = rawName.replace(/\.json$/i, '')
+        const content = fileResult.content || ''
+        let lineCount = 0
+        try {
+          const parsed = JSON.parse(content)
+          const arr = Array.isArray(parsed) ? parsed : (parsed.codeSearchResults || parsed.data?.searchResults || [])
+          lineCount = Array.isArray(arr) ? arr.length : 0
+        } catch {
+          lineCount = content.split('\n').length
+        }
+        return {
+          id: `module_${name}`,
+          name,
+          filePath: fileResult.filePath,
+          content,
+          lineCount,
+          importedAt: Date.now()
+        }
+      })
+
+      const existing = await window.electronAPI.loadProjectData(target)
+      const existingLogs = existing?.moduleLogs || []
+      const existingMappings = existing?.moduleMappings || []
+      const mergedLogs = mode === 'overwrite' ? newModules : [...existingLogs, ...newModules]
+
+      await window.electronAPI.saveProjectData(target, { moduleLogs: mergedLogs, moduleMappings: existingMappings })
+      await switchProject(target)
+
+      const modeText = mode === 'merge' ? '合并导入' : '覆盖导入'
+      setNotification(`${modeText}成功：项目「${target}」新增 ${newModules.length} 个模块日志`)
     } catch (err) {
       console.error('Import module log error:', err)
       setNotification('导入模块日志失败')
     }
-  }, [])
+  }, [ensureProject, switchProject])
 
   const handleRemoveModuleLog = useCallback((id: string) => {
     logger.info(logCategories.ANALYSIS, '移除模块日志', `ID: ${id}`)
@@ -950,22 +1074,47 @@ function App() {
     setNotification('已移除模块')
   }, [])
 
-  const handleImportModuleMapping = useCallback(async () => {
-    logger.info(logCategories.ANALYSIS, '导入模块映射表')
+  const handleUpdateModuleLog = useCallback((id: string, content: string) => {
+    let count = 0
     try {
+      const arr = JSON.parse(content)
+      count = Array.isArray(arr) ? arr.length : 0
+    } catch {
+      count = 0
+    }
+    setModuleLogs(prev => prev.map(m => (m.id === id ? { ...m, content, lineCount: count } : m)))
+  }, [])
+
+  const handleImportModuleMapping = useCallback(async (projectName: string, mode: 'overwrite' | 'merge') => {
+    logger.info(logCategories.ANALYSIS, '导入模块映射表', `项目: ${projectName}, 模式: ${mode}`)
+    try {
+      const target = await ensureProject(projectName)
+      if (!target) return
       const result = await window.electronAPI.importConfig()
       if (result.success && result.config) {
         const config = result.config as any
-        // 支持两种格式：config.mappings 或 config.data.moduleMappings
-        const mappings = config.mappings || (config.data && config.data.moduleMappings)
-        if (mappings && Array.isArray(mappings)) {
-          setModuleMappings(mappings)
-          setNotification(`已导入 ${mappings.length} 条映射关系`)
+        const rawMappings = config.mappings || (config.data && config.data.moduleMappings) || (Array.isArray(config) ? config : null)
+        if (rawMappings && Array.isArray(rawMappings)) {
+          const mappings: ModuleMapping[] = rawMappings.map((m: any) => ({
+            codePath: m.codePath || '',
+            moduleName: m.moduleName || '',
+            contactName: m.contactName || ''
+          }))
+          const existing = await window.electronAPI.loadProjectData(target)
+          const existingLogs = existing?.moduleLogs || []
+          const existingMappings = existing?.moduleMappings || []
+          const mergedMappings = mode === 'overwrite' ? mappings : [...existingMappings, ...mappings]
+
+          await window.electronAPI.saveProjectData(target, { moduleLogs: existingLogs, moduleMappings: mergedMappings })
+          await switchProject(target)
+
+          const modeText = mode === 'merge' ? '合并导入' : '覆盖导入'
+          setNotification(`${modeText}成功：项目「${target}」导入 ${mappings.length} 条映射关系`)
         } else {
           setNotification('文件格式无效：缺少 mappings 字段')
         }
       } else if (result.reason === 'cancelled') {
-        // User cancelled
+        // 用户取消
       } else {
         setNotification('导入映射表失败')
       }
@@ -973,7 +1122,7 @@ function App() {
       console.error('Import module mapping error:', err)
       setNotification('导入映射表失败')
     }
-  }, [])
+  }, [ensureProject, switchProject])
 
   const handleFilterComplete = useCallback(async (filteredContent: string, filteredFileName: string, removedCount: number) => {
     if (!currentFile) return
@@ -1195,15 +1344,40 @@ function App() {
           setShowLogMatchPanel(true)
         }}
         onShowImportDialog={() => setShowImportDialog(true)}
+        onShowDataManagement={() => setShowDataManagement(true)}
         onShowSettings={() => setShowSettings(true)}
         userRole={userRole}
+        projectList={projectList}
+        activeProject={activeProject}
+        onSwitchProject={switchProject}
+        onCreateProject={handleCreateProject}
       />
 
       {showImportDialog && (
         <ImportDialog
+          projectList={projectList}
+          activeProject={activeProject}
           onImportModuleLog={handleImportModuleLog}
           onImportModuleMapping={handleImportModuleMapping}
           onClose={() => setShowImportDialog(false)}
+        />
+      )}
+
+      {showDataManagement && (
+        <DataManagementPanel
+          projectList={projectList}
+          activeProject={activeProject}
+          moduleLogs={moduleLogs}
+          moduleMappings={moduleMappings}
+          onSwitchProject={switchProject}
+          onCreateProject={handleCreateProject}
+          onDeleteProject={handleDeleteProject}
+          onChangeModuleMappings={setModuleMappings}
+          onRemoveModuleLog={handleRemoveModuleLog}
+          onUpdateModuleLog={handleUpdateModuleLog}
+          onImportModuleLog={(mode) => handleImportModuleLog(activeProject, mode)}
+          onShowNotification={setNotification}
+          onClose={() => setShowDataManagement(false)}
         />
       )}
 
@@ -1342,8 +1516,55 @@ function App() {
                 setWelcomeContextMenu({ x: e.clientX, y: e.clientY })
               }}
             >
-              <h1>日志分析工具</h1>
-              <p>点击工具栏的"打开文件"或"打开文件夹"开始分析日志</p>
+              <div className="welcome-card">
+                <div className="welcome-icon">🔍</div>
+                <h1 className="welcome-title">日志分析工具</h1>
+                <p className="welcome-subtitle">快速定位问题 · 智能匹配模块 · 一键导出报告</p>
+
+                <div
+                  className={`welcome-dropzone ${isDragOver ? 'active' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <div className="welcome-dropzone-icon">📂</div>
+                  <div className="welcome-dropzone-text">
+                    {isDragOver ? '释放文件以打开' : '拖拽日志文件到此处'}
+                  </div>
+                  <div className="welcome-dropzone-hint">支持 .log .txt .json 格式</div>
+                </div>
+
+                <div className="welcome-actions">
+                  <button className="welcome-btn primary" onClick={handleOpenFile}>
+                    <span className="welcome-btn-icon">📂</span> 打开文件
+                  </button>
+                  <button className="welcome-btn" onClick={() => setShowImportDialog(true)}>
+                    <span className="welcome-btn-icon">📥</span> 导入配置
+                  </button>
+                </div>
+
+                {history.length > 0 && (
+                  <div className="welcome-recent">
+                    <div className="welcome-recent-title">最近打开</div>
+                    <div className="welcome-recent-list">
+                      {history.slice(0, 5).map((filePath, i) => (
+                        <button
+                          key={i}
+                          className="welcome-recent-item"
+                          onClick={() => handleOpenFromHistory(filePath)}
+                          title={filePath}
+                        >
+                          📄 {filePath.split(/[\\/]/).pop() || filePath}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="welcome-tips">
+                  <span>💡 提示：导入模块映射表后可进行快速分析匹配</span>
+                </div>
+              </div>
             </div>
           )}
         </div>

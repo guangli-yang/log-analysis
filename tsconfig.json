@@ -17,6 +17,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
-  "exclude": ["src/sync-panel-main.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

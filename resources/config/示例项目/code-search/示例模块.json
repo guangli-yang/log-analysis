@@ -1,0 +1,23 @@
+[
+  {
+    "codeFile": { "fileName": "C:\\project\\2\\network.c" },
+    "line": 88,
+    "functionName": "sendData",
+    "matchedPattern": "LOGE错误",
+    "matchedText": "Network send error"
+  },
+  {
+    "codeFile": { "fileName": "C:\\project\\1\\audio.cpp" },
+    "line": 200,
+    "functionName": "playAudio",
+    "matchedPattern": "LOGE错误",
+    "matchedText": "Audio buffer underrun"
+  },
+  {
+    "codeFile": { "fileName": "C:\\project\\3\\decoder.c" },
+    "line": 45,
+    "functionName": "decodeFrame",
+    "matchedPattern": "LOGE错误",
+    "matchedText": "Decode failed"
+  }
+]
