@@ -14,6 +14,7 @@ interface DataManagementPanelProps {
   onRemoveModuleLog: (id: string) => void
   onUpdateModuleLog: (id: string, content: string) => void
   onImportModuleLog: (mode: 'overwrite' | 'merge') => void
+  onImportModuleMapping: (mode: 'overwrite' | 'merge') => void
   onShowNotification: (message: string) => void
   onClose: () => void
 }
@@ -52,12 +53,14 @@ const LogGroup = React.memo(({
   onToggle,
   onRemoveModuleLog,
   onUpdateModuleLog,
+  onExportLog,
 }: {
   log: ModuleLog
   expanded: boolean
   onToggle: () => void
   onRemoveModuleLog: (id: string) => void
   onUpdateModuleLog: (id: string, content: string) => void
+  onExportLog: (log: ModuleLog) => void
 }) => {
   const entries = useMemo(() => (expanded ? parseEntries(log.content) : []), [expanded, log.content])
 
@@ -90,6 +93,14 @@ const LogGroup = React.memo(({
         <span className="dm-log-group-meta">
           {log.lineCount} 条 · 导入 {log.importedAt ? new Date(log.importedAt).toLocaleString() : '—'}
         </span>
+        <button
+          className="dm-btn small"
+          title="导出此模块日志"
+          onClick={(e) => {
+            e.stopPropagation()
+            onExportLog(log)
+          }}
+        >📤 导出</button>
         <button
           className="dm-btn danger small"
           title="删除整个文件"
@@ -170,6 +181,7 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
   onRemoveModuleLog,
   onUpdateModuleLog,
   onImportModuleLog,
+  onImportModuleMapping,
   onShowNotification,
   onClose
 }) => {
@@ -216,6 +228,17 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
     onChangeModuleMappings([])
     onShowNotification('模块负责人表已清空')
   }, [moduleMappings, onChangeModuleMappings, onShowNotification])
+
+  const handleExportMappings = useCallback(async () => {
+    const data = { version: '2.0', mappings: moduleMappings }
+    await window.electronAPI.saveJson(data, `模块负责人表_${activeProject}_${new Date().toISOString().slice(0, 10)}.json`)
+    onShowNotification('模块负责人表已导出')
+  }, [moduleMappings, activeProject, onShowNotification])
+
+  const handleExportModuleLog = useCallback(async (log: ModuleLog) => {
+    await window.electronAPI.saveJson(log.content ? JSON.parse(log.content) : [], `${log.name}_${new Date().toISOString().slice(0, 10)}.json`)
+    onShowNotification(`模块日志「${log.name}」已导出`)
+  }, [onShowNotification])
 
   const toggleLogGroup = useCallback((id: string) => {
     setExpandedLogs(prev => {
@@ -372,6 +395,9 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
                 <span className="dm-section-hint">可直接编辑单元格，修改自动保存到项目配置</span>
                 <div className="dm-section-actions">
                   <button className="dm-btn primary" onClick={handleAddMapping}>+ 新增</button>
+                  <button className="dm-btn" onClick={() => onImportModuleMapping('merge')}>+ 导入(合并)</button>
+                  <button className="dm-btn" onClick={() => onImportModuleMapping('overwrite')}>覆盖导入</button>
+                  <button className="dm-btn" onClick={handleExportMappings} disabled={moduleMappings.length === 0}>📤 导出</button>
                   <button className="dm-btn danger" onClick={handleClearMappings} disabled={moduleMappings.length === 0}>一键清空</button>
                 </div>
               </div>
@@ -439,6 +465,7 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
                       onToggle={() => toggleLogGroup(log.id)}
                       onRemoveModuleLog={onRemoveModuleLog}
                       onUpdateModuleLog={onUpdateModuleLog}
+                      onExportLog={handleExportModuleLog}
                     />
                   ))
                 )}

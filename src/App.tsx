@@ -1376,6 +1376,7 @@ function App() {
           onRemoveModuleLog={handleRemoveModuleLog}
           onUpdateModuleLog={handleUpdateModuleLog}
           onImportModuleLog={(mode) => handleImportModuleLog(activeProject, mode)}
+          onImportModuleMapping={(mode) => handleImportModuleMapping(activeProject, mode)}
           onShowNotification={setNotification}
           onClose={() => setShowDataManagement(false)}
         />
