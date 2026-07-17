@@ -28,3 +28,13 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Project workspace data
+.codebuddy/
+
+# ctags extras (only ctags.exe is needed)
+resources/ctags/README.md
+resources/ctags/docs/
+resources/ctags/license/
+resources/ctags/man/
+resources/ctags/readtags.exe
