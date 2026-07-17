@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { ModuleLog, ModuleMapping } from '../types'
+import ThinkingOverlay from './ThinkingOverlay'
 import './DataManagementPanel.css'
 
 interface DataManagementPanelProps {
@@ -7,14 +8,21 @@ interface DataManagementPanelProps {
   activeProject: string
   moduleLogs: ModuleLog[]
   moduleMappings: ModuleMapping[]
+  stagedModuleLogs: ModuleLog[]
+  stagedModuleMappings: ModuleMapping[]
+  isBusy?: boolean
   onSwitchProject: (name: string) => void
   onCreateProject: (name: string) => void
   onDeleteProject: (name: string) => void
   onChangeModuleMappings: (mappings: ModuleMapping[]) => void
   onRemoveModuleLog: (id: string) => void
   onUpdateModuleLog: (id: string, content: string) => void
-  onImportModuleLog: (mode: 'overwrite' | 'merge') => void
-  onImportModuleMapping: (mode: 'overwrite' | 'merge') => void
+  onStageImportModuleLog: () => void
+  onMergeModuleLog: () => void
+  onStageImportModuleMapping: () => void
+  onMergeModuleMapping: () => void
+  onClearStagedModuleLogs: () => void
+  onClearStagedModuleMappings: () => void
   onShowNotification: (message: string) => void
   onClose: () => void
 }
@@ -174,14 +182,21 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
   activeProject,
   moduleLogs,
   moduleMappings,
+  stagedModuleLogs,
+  stagedModuleMappings,
+  isBusy,
   onSwitchProject,
   onCreateProject,
   onDeleteProject,
   onChangeModuleMappings,
   onRemoveModuleLog,
   onUpdateModuleLog,
-  onImportModuleLog,
-  onImportModuleMapping,
+  onStageImportModuleLog,
+  onMergeModuleLog,
+  onStageImportModuleMapping,
+  onMergeModuleMapping,
+  onClearStagedModuleLogs,
+  onClearStagedModuleMappings,
   onShowNotification,
   onClose
 }) => {
@@ -395,12 +410,21 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
                 <span className="dm-section-hint">可直接编辑单元格，修改自动保存到项目配置</span>
                 <div className="dm-section-actions">
                   <button className="dm-btn primary" onClick={handleAddMapping}>+ 新增</button>
-                  <button className="dm-btn" onClick={() => onImportModuleMapping('merge')}>+ 导入(合并)</button>
-                  <button className="dm-btn" onClick={() => onImportModuleMapping('overwrite')}>覆盖导入</button>
+                  <button className="dm-btn" onClick={onStageImportModuleMapping}>+ 导入</button>
+                  <button className="dm-btn" onClick={onMergeModuleMapping} disabled={stagedModuleMappings.length === 0}>合并 ({stagedModuleMappings.length})</button>
                   <button className="dm-btn" onClick={handleExportMappings} disabled={moduleMappings.length === 0}>📤 导出</button>
                   <button className="dm-btn danger" onClick={handleClearMappings} disabled={moduleMappings.length === 0}>一键清空</button>
                 </div>
               </div>
+              {stagedModuleMappings.length > 0 && (
+                <div className="dm-staged-banner">
+                  <span>📥 待合并映射表：{stagedModuleMappings.length} 条（{stagedModuleMappings.map(m => m.moduleName || m.codePath).filter(Boolean).join('、') || '未命名'}）</span>
+                  <span className="dm-staged-actions">
+                    <button className="dm-btn small primary" onClick={onMergeModuleMapping}>立即合并</button>
+                    <button className="dm-btn small" onClick={onClearStagedModuleMappings}>清空暂存</button>
+                  </span>
+                </div>
+              )}
               <div className="dm-table-wrap">
                 <table className="dm-table">
                   <thead>
@@ -449,10 +473,19 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
                   {expandedLogs.size > 0 && (
                     <button className="dm-btn small" onClick={collapseAll}>全部折叠</button>
                   )}
-                  <button className="dm-btn primary" onClick={() => onImportModuleLog('merge')}>+ 导入(合并)</button>
-                  <button className="dm-btn" onClick={() => onImportModuleLog('overwrite')}>覆盖导入</button>
+                  <button className="dm-btn primary" onClick={onStageImportModuleLog}>+ 导入</button>
+                  <button className="dm-btn" onClick={onMergeModuleLog} disabled={stagedModuleLogs.length === 0}>合并 ({stagedModuleLogs.length})</button>
                 </div>
               </div>
+              {stagedModuleLogs.length > 0 && (
+                <div className="dm-staged-banner">
+                  <span>📥 待合并模块日志：{stagedModuleLogs.length} 个（{stagedModuleLogs.map(l => l.name).join('、')}）</span>
+                  <span className="dm-staged-actions">
+                    <button className="dm-btn small primary" onClick={onMergeModuleLog}>立即合并</button>
+                    <button className="dm-btn small" onClick={onClearStagedModuleLogs}>清空暂存</button>
+                  </span>
+                </div>
+              )}
               <div className="dm-logs-groups">
                 {displayLogs.length === 0 ? (
                   <div className="dm-empty"><p>暂无模块日志，点击右上角导入</p></div>
@@ -474,6 +507,7 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
           )}
         </div>
       </div>
+      <ThinkingOverlay show={!!isBusy} title="正在处理…" subtitle="正在深度合并模块数据，请稍候" />
     </div>
   )
 }

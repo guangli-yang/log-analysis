@@ -50,6 +50,12 @@
       "dist/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "resources/ctags/ctags.exe",
+        "to": "ctags/ctags.exe"
+      }
+    ],
     "extraFiles": [
       {
         "from": "resources/config",

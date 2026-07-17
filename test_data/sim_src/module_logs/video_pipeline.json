@@ -1,0 +1,77 @@
+{
+  "file": "video_pipeline.cpp",
+  "codeSearchResults": [
+    {
+      "id": "v1",
+      "codeFile": {
+        "fileName": "video_pipeline.cpp"
+      },
+      "line": 649,
+      "functionName": "video_pcie_cancel_process",
+      "matchedText": "[VIDEO] CANCEL",
+      "keywords": [
+        "cancel"
+      ],
+      "level": "ERROR"
+    },
+    {
+      "id": "v2",
+      "codeFile": {
+        "fileName": "video_pipeline.cpp"
+      },
+      "line": 777,
+      "functionName": "video_driver_cancel_process",
+      "matchedText": "[VIDEO] video cancel request",
+      "keywords": [
+        "video",
+        "cancel",
+        "request"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "v3",
+      "codeFile": {
+        "fileName": "video_pipeline.cpp"
+      },
+      "line": 78,
+      "functionName": "video_del_all_page_from_list",
+      "matchedText": "[VIDEO] video page list empty video_pending_list | [VIDEO] video page list empty video_printing_list",
+      "keywords": [
+        "video",
+        "page",
+        "list",
+        "empty"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "v5",
+      "codeFile": {
+        "fileName": "video_pipeline.cpp"
+      },
+      "line": 148,
+      "functionName": "video_free",
+      "matchedText": "[VIDEO] VDIEO_LASER_CHDEV_FREE OK ret[0]",
+      "keywords": [
+        "laser",
+        "chdev",
+        "free"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "v6",
+      "codeFile": {
+        "fileName": "video_pipeline.cpp"
+      },
+      "line": 423,
+      "functionName": "video_pcie_band_alloc_suspend",
+      "matchedText": "[VIDEO] OK",
+      "keywords": [
+        "ok"
+      ],
+      "level": "INFO"
+    }
+  ]
+}

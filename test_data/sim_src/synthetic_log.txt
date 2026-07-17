@@ -1,0 +1,57 @@
+
+[2026-07-15 10:23:17.372] [10:20:27.064] 仅仅一个时间戳，无标签无函数 
+
+[2026-07-15 10:23:17.372] [10:20:27.064] jobRun                                           - [INFO][IPSLIB][1192][jobRun]job->namePipeline[SNIFFER]
+[2026-07-15 10:23:17.372] [10:20:27.064] jobRun                                           - [INFO][IPSLIB][1201][jobRun]Update job id[284] 
+[2026-07-15 10:23:17.372] [10:20:27.064] jobRun                                           - [INFO][IPSLIB][1215][jobRun]Job Run status [RUN] 
+[2026-07-15 10:23:17.372] [10:20:27.064] scan_parser_thread                               - [INFO][SCAN_MFP] SCAN_PARSER_STATE_JOB
+[2026-07-15 10:23:17.372] [10:20:27.064] scan_parser_host_message_process                 - [DEBUG][SCAN_MFP] no data
+[2026-07-15 10:23:17.372] [10:20:27.064] scan_parser_thread                               - [INFO][SCAN_MFP] SCAN_PARSER_STATE_JOB
+[2026-07-15 10:23:17.372] [10:20:27.064] mode_answer_0x4D_callback_func                   - [INFO][SCAN_MFP] PAGE_ON signal  [0==>1] 
+[2026-07-15 10:23:17.372] [10:20:27.064] debug_printf_recv_cmd                            - [INFO][SCAN_MFP] [808.975] SCAN_ENG ADF=>CTL [9c-57-03-74-7f-]
+[2026-07-15 10:23:17.372] [10:20:27.064] mode_answer_0x57_callback_func                   - [INFO][SCAN_MFP] 0x9c 0x57 0x03 0x74 0x7f 
+[2026-07-15 10:23:17.372] [10:20:27.064] scan_parser_host_message_process                 - [DEBUG][SCAN_MFP] no data
+[2026-07-15 10:23:17.372] [10:20:27.064] print_info_event_outside_process                 - [INFO]L335 :Receive event head [285409282] !!!
+[2026-07-15 10:23:17.372] [10:20:27.064] print_relay_send_page_to_relay_read              - [INFO]L796 :send page 72 to read
+[2026-07-15 10:23:17.372] [10:20:27.064] recv_pcie_data_cb                                - [DEBUG] Successfully sent data to USB panel, size: 0
+[2026-07-15 10:23:17.372] [10:20:27.064] usbd_pack_success                                - [INFO] usbd_pack_success endpoint=0  com=0x83
+[2026-07-15 10:23:17.372] [10:20:27.064] usbd_pack_success                                - [INFO] usbd_pack_success endpoint=0  com=0x82
+[2026-07-15 10:23:17.372] [10:20:27.064] mfp_3588_data_proc                               - [DEBUG] Received 3588 data: header=0x02000004, type=4, value=0, res_type=2, data_len=80
+[2026-07-15 10:23:17.372] [10:20:27.064] recv_pcie_data_cb                                - [DEBUG] Successfully sent data to USB panel, size: 0
+[2026-07-15 10:23:17.372] [10:20:27.064] video_pcie_cancel_process                        - [ERROR]L649 :[VIDEO] CANCEL
+[2026-07-15 10:23:17.372] [10:20:27.064] video_driver_cancel_process                      - [INFO]L777 :[VIDEO] video cancel request
+[2026-07-15 10:23:17.372] [10:20:27.064] video_del_all_page_from_list                     - [INFO]L78 :[VIDEO] video page list empty video_pending_list
+[2026-07-15 10:23:17.372] [10:20:27.064] video_del_all_page_from_list                     - [INFO]L78 :[VIDEO] video page list empty video_printing_list
+[2026-07-15 10:23:17.372] [10:20:27.064] video_free                                       - [INFO]L148 :[VIDEO] VDIEO_LASER_CHDEV_FREE OK ret[0]
+[2026-07-15 10:23:17.372] [10:20:27.064] video_pcie_band_alloc_suspend                    - [INFO]L423 :[VIDEO] OK
+[2026-07-15 10:23:17.372] [   0:21:12.350][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L137 DispatchEvent():START, ui_proc_ev ev_id = 0x03000006(EVT_ID_UI_POWERMGR_AUTO_BACK), ctrl_id = 0x00000000(UI_CTRL_ID_ALL), state_id = 0x00000000(WINDOW_ID_INVALID), item_id = 0x00000000(UI_ITEM_ID_INVALID)
+[2026-07-15 10:23:17.372] [   0:21:12.350][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L176 DispatchEvent():pedk_serv_mgr process start
+[2026-07-15 10:23:17.372] [   0:21:12.350][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L182 DispatchEvent():pedk_serv_mgr process result = 1(EVT_RES_CONTINUE)
+[2026-07-15 10:23:17.372] [   0:21:12.350][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L192 DispatchEvent():fw process
+[2026-07-15 10:23:17.372] [   0:21:12.350][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L207 DispatchEvent():ui_proc_ev top_state = 0x00010001(eWINDOW_ID_MAIN), END
+[2026-07-15 10:23:17.372] [   0:21:12.350][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L137 DispatchEvent():START, ui_proc_ev ev_id = 0x03000001(EVT_ID_UI_INFO_CTRL_START), ctrl_id = 0x00000001(UI_CTRL_ID_MAIN), state_id = 0x00000000(WINDOW_ID_INVALID), item_id = 0x00000000(UI_ITEM_ID_INVALID)
+[2026-07-15 10:23:17.372] [10:20:27.064] WrapperOutputToStep                              - [DEBUG] scan_pu_wrapper WrapperOutputToStep
+[2026-07-15 10:23:17.372] [10:20:27.064] sendNext                                         - [DEBUG] unit:scan_pu send msg done at time:20260715_100146_891
+[2026-07-15 10:23:17.372] [10:20:27.064] edge_crop_write                                  - [INFO]<#IPM>[JobID:0] step(edge_crop) is dealing with page -> imgin  : FRONT w 2496 h 3520 s 7488 d 24 f 201
+[2026-07-15 10:23:17.372] [10:20:27.064] edge_crop_write                                  - [INFO]<#IPM>[JobID:0] step(edge_crop) is dealing with page -> imgout : FRONT w 2480 h 3520 s 7440 d 24 f 201
+[2026-07-15 10:23:17.372] [10:20:27.064] releaseFrameResource                             - [DEBUG][2026-07-15 10:01:46.893] scan_pu: FrameResources released, active count: 0
+[2026-07-15 10:23:17.372] [10:20:27.064] pipe_core_run_this_step                          - [INFO]<#IPM>[JobID:0] EOI from scan_pu_step
+[2026-07-15 10:23:17.372] [10:20:27.064] ipc_receive_handler                              - [INFO][SCAN_APP] bio_get_buffer.len :256 msg_type 112 
+[2026-07-15 10:23:17.372] [10:20:27.064] ipc_receive_handler                              - [INFO][SCAN_APP] bio_get_buffer.len :256 msg_type 115 
+[2026-07-15 10:23:17.372] [10:20:27.064] ScanMgrThread                                    - [INFO][SCAN_APP] msg from pcie: 112 256
+[2026-07-15 10:23:17.372] [10:20:27.064] ScanMgrCommandProcess                            - [INFO][SCAN_APP] recv copy calc data 112
+[2026-07-15 10:23:17.372] [10:20:27.064] image_processing_manager_scan_thread             - [INFO]<#IPM>[JobID:0] ipm recv Y cali data
+[2026-07-15 10:23:17.372] [10:20:27.064] ScanMgrThread                                    - [INFO][SCAN_APP] msg from pcie: 115 256
+[2026-07-15 10:23:17.372] [10:20:27.064] ScanMgrCommandProcess                            - [INFO][SCAN_APP] recv copy calc data 115
+[2026-07-15 10:23:17.372] [10:20:27.064] image_processing_manager_scan_thread             - [INFO]<#IPM>[JobID:0] ipm recv K cali data
+[2026-07-15 10:23:17.372] [10:20:27.064] retryScheduler                                   - [INFO]L777 :retry count [3] remaining
+[2026-07-15 10:23:17.372] [10:20:27.064] bigLineLogger                                    - [INFO]L1234567 :seven digit line number
+[2026-07-15 10:23:17.372] [10:20:27.064] unicodeLogger                                    - [INFO]L555 :处理完成 状态正常 重试
+[2026-07-15 10:23:17.372] [10:20:27.064] longLineLogger                                   - [INFO]L666 :XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX marker_end
+[2026-07-15 10:23:17.372] [10:20:27.064] LOGE                                             - [ERROR] critical failure reported
+[2026-07-15 10:23:17.372] [10:20:27.064] traceFunc                                        - [TRACE][EDGE] trace point alpha
+[2026-07-15 10:23:17.372] [10:20:27.064] fatalHandler                                     - [FATAL]L888 :system halt [0xffff]
+[2026-07-15 10:23:17.372] [   0:21:12.350][DEBUG] /proj/ui/PanelView.cpp L137 DispatchEvent():panel view dispatch START
+[2026-07-15 10:23:17.372] [10:20:27.064] warnFunc                                         - [WARN] low memory warning [5]
+[2026-07-15 10:23:17.372] [10:20:27.064] sendData                                         - [INFO] dispatch event sent [0x12]
+[2026-07-15 10:23:17.372] [10:20:27.064] fetchConfig                                      - [DEBUG]L909 :config loaded [ok]

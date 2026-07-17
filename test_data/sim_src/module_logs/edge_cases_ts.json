@@ -1,0 +1,34 @@
+{
+  "file": "edge_cases_ts.ts",
+  "codeSearchResults": [
+    {
+      "id": "t1",
+      "codeFile": {
+        "fileName": "edge_cases_ts.ts"
+      },
+      "line": 0,
+      "functionName": "sendData",
+      "matchedText": "dispatch event sent [0x12]",
+      "keywords": [
+        "dispatch",
+        "event",
+        "sent"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "t2",
+      "codeFile": {
+        "fileName": "edge_cases_ts.ts"
+      },
+      "line": 909,
+      "functionName": "fetchConfig",
+      "matchedText": "config loaded [ok]",
+      "keywords": [
+        "config",
+        "loaded"
+      ],
+      "level": "DEBUG"
+    }
+  ]
+}

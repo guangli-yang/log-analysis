@@ -373,3 +373,24 @@
   border-top: 1px solid var(--border-color);
   background: var(--bg-tertiary);
 }
+
+.dm-staged-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+  padding: 10px 14px;
+  border: 1px dashed #4dabf7;
+  border-radius: 8px;
+  background: rgba(77, 171, 247, 0.1);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.dm-staged-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}

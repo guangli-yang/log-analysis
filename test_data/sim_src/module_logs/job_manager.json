@@ -1,0 +1,48 @@
+{
+  "file": "job_manager.cpp",
+  "codeSearchResults": [
+    {
+      "id": "j1",
+      "codeFile": {
+        "fileName": "job_manager.cpp"
+      },
+      "line": 1192,
+      "functionName": "jobRun",
+      "matchedText": "job->namePipeline[SNIFFER]",
+      "keywords": [
+        "namepipeline"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "j2",
+      "codeFile": {
+        "fileName": "job_manager.cpp"
+      },
+      "line": 1201,
+      "functionName": "jobRun",
+      "matchedText": "Update job id[284] ",
+      "keywords": [
+        "update",
+        "job",
+        "id"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "j3",
+      "codeFile": {
+        "fileName": "job_manager.cpp"
+      },
+      "line": 1215,
+      "functionName": "jobRun",
+      "matchedText": "Job Run status [RUN] ",
+      "keywords": [
+        "job",
+        "run",
+        "status"
+      ],
+      "level": "INFO"
+    }
+  ]
+}

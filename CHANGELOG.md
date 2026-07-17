@@ -1,6 +1,137 @@
 # 版本更新说明
 
-## v1.2.0 — 项目级配置管理 · 数据管理面板 · UX 全面升级
+## v1.3.1 — 匹配引擎重构 · ctags 函数名智能提取 · 快捷键修复
+
+> 发布日期：2026-07-17
+
+---
+
+## 一、快速分析匹配引擎重构
+
+### 1.1 从"启发式猜测"到"模式匹配"
+
+v1.2 的匹配引擎使用 3 级置信度 + 3 阶段回退 + 评分排优 + 跨模块消歧的复杂管线，代码约 350 行。由于日志格式无法预测，各阶段之间通过置信度标记层层传递，维护和理解成本较高。
+
+v1.3 将所有日志格式归为 3 种确定性结构模式：
+
+| 模式 | 格式特征 | 匹配规则 |
+|------|----------|----------|
+| **A** | `funcName - [LEVEL]...` | 仅 funcName 精确匹配 |
+| **B** | `[ts][LEVEL] filePath L### funcName():` | fileName(基本名) + funcName 匹配 |
+| **C** | `funcName- filePath L### [MOD][LEVEL]` | 同 B，fileName + funcName 匹配 |
+
+**前提条件**：日志等级必须 ≥ ERROR（ERROR / ERR / FATAL / CRITICAL / ASSERT / PANIC），WARNING / INFO / DEBUG 等一律忽略。
+
+**不满足任何模式的行直接忽略**，无内容兜底。
+
+### 1.2 变更统计
+
+| 维度 | v1.2 | v1.3 |
+|------|------|------|
+| 代码量 | ~350 行 | **~170 行**（-51%） |
+| 匹配阶段 | 3 阶段 + 回退逻辑 | **单次 find()** |
+| 置信度 | high / low / none | **移除** |
+| 评分模型 | bestByScore 加权 | **移除** |
+| 内容兜底 | ≥2 关键词全词 | **移除** |
+| 行号参与匹配 | Stage A 优先行号 | **不参与匹配决策** |
+
+### 1.3 接口兼容性
+
+`LogMatchPanel.tsx` 仅依赖 `matchModuleAgainstLog()`，签名和返回值结构未变，无需任何改动。
+
+---
+
+## 二、代码检索函数名提取 — ctags 集成
+
+### 2.1 问题背景
+
+v1.2 使用复杂正则解析 C/C++ 函数签名（`extractFuncDef`，约 30 行正则），存在以下结构性缺陷：
+
+- **指针返回类型无空格**：`char* func()` 无法识别
+- **嵌套括号参数**：`void f(void(*cb)(int))` 参数截断
+- **构造函数初始化列表**：`Foo(x):m_x(x){}` 无法识别
+- 返回类型修饰词（`static`、`inline`、`const`、模板等）组合繁多，正则难以穷举
+
+导致大量 CodeSearchResult 的 `functionName` 字段为空，快速分析匹配率下降。
+
+### 2.2 解决方案
+
+集成 **Universal Ctags v6.1.0**（编译器前端级源码解析器），替代正则扫描：
+
+```
+检索开始 → ctags -R 扫描全目录（3-8 秒，一次性）
+         → Map<文件路径, Map<行号, 函数名>>
+         → processFile 中 O(1) 查表 ← 替代 500 行正则扫描
+```
+
+### 2.3 技术细节
+
+- **二进制**：`resources/ctags/ctags.exe`（Windows x64，4.5MB）
+- **调用方式**：Node.js `execFile`，输出解析为结构化索引
+- **降级策略**：ctags 二进制不存在 / 执行超时（60s）/ 输出溢出（50MB 上限）→ 自动回退原有正则方案
+- **打包**：`package.json` 新增 `extraResources`，electron-builder 自动打入安装包
+- **跨平台**：保留 Linux / macOS 二进制占位路径，当前仅打包 Windows 版本
+
+### 2.4 效果验证
+
+在 `test_data/sim_src/` 测试集上：
+
+| 文件 | 函数总数 | ctags 命中 | 覆盖率 |
+|------|:--:|:--:|:--:|
+| `video_pipeline.cpp` | 5 | 5 | 100% |
+| `scan_pu.cpp` | 5 | 5 | 100% |
+| `job_manager.cpp` | 3 | 3 | 100% |
+| `pcie_data.cpp` | 4 | 4 | 100% |
+| `scan_mfp.cpp` | 5 | 5 | 100% |
+
+全部与 `_expected.json` 吻合。
+
+---
+
+## 三、Ctrl+F / Ctrl+G 快捷键修复
+
+### 3.1 问题
+
+中文 Windows 下 IME（输入法）激活时，`keydown` 事件的 `e.key` 变为 `'Process'`，原有 `e.key === 'f'` 判定失效；同时冒泡阶段 `e.preventDefault()` 可能被 Chromium 默认行为抢先。
+
+### 3.2 修复
+
+**双层方案（主进程 + 渲染进程）**：
+
+| 层级 | 文件 | 方案 |
+|------|------|------|
+| 主进程 | `electron/main.ts` | `before-input-event` + `input.code === 'KeyF'/'KeyG'`（物理键码）抢先 preventDefault，IPC 转发 |
+| 渲染进程 | `src/App.tsx` | `keydown` 改用 `e.code` + 捕获阶段 (`addEventListener(..., true)`) 兜底 |
+| preload | `electron/preload.ts` | 新增 `on(channel, cb)` 订阅主进程消息 |
+| 类型 | `src/vite-env.d.ts` | `ElectronAPI` 补 `on` 声明 |
+
+---
+
+## 四、其他改进
+
+- 新增 `ThinkingOverlay` 组件：快速分析匹配中显示"思考中"遮罩，改善等待体验
+- 新增 `src/utils/mergeData.ts`：模块日志 / 负责人表深度合并工具
+- `DataManagementPanel`：编辑交互与样式优化
+- `CodeSearchPanel`：AI 在线检索模式支持
+
+---
+
+## 五、修改文件统计
+
+| 类型 | 数量 | 关键文件 |
+|------|:--:|------|
+| 新增 | 6 | `src/utils/logMatch.ts`, `src/utils/mergeData.ts`, `src/components/ThinkingOverlay.*` |
+| 新增（资源） | 1 | `resources/ctags/ctags.exe` |
+| 修改 | 10 | `electron/main.ts`, `package.json`, `src/App.tsx`, `src/types.ts`, 组件等 |
+| **合计** | **17 files** | |
+
+### 关键代码改动
+
+- `src/utils/logMatch.ts` (+170 行)：全新匹配引擎，3 模式正则
+- `electron/main.ts` (+103 行)：`buildGlobalFuncMap` + `processFile` ctags 改造
+- `electron/main.ts` (+37 行)：快捷键输入事件层拦截
+- `src/App.tsx` (+175 行)：快捷键修复 + 在线代码检索 + ThinkingOverlay
+- `package.json` (+6 行)：`extraResources` ctags 打包配置
 
 > 发布日期：2026-07-14
 

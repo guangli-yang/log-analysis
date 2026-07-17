@@ -1,0 +1,78 @@
+{
+  "file": "scan_pu.cpp",
+  "codeSearchResults": [
+    {
+      "id": "u1",
+      "codeFile": {
+        "fileName": "scan_pu.cpp"
+      },
+      "line": 0,
+      "functionName": "WrapperOutputToStep",
+      "matchedText": "scan_pu_wrapper WrapperOutputToStep",
+      "keywords": [
+        "scan_pu_wrapper",
+        "wrapperoutputtostep"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "u2",
+      "codeFile": {
+        "fileName": "scan_pu.cpp"
+      },
+      "line": 0,
+      "functionName": "sendNext",
+      "matchedText": "unit:scan_pu send msg done at time:20260715_100146_891",
+      "keywords": [
+        "unit:scan_pu",
+        "send",
+        "msg",
+        "done"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "u3",
+      "codeFile": {
+        "fileName": "scan_pu.cpp"
+      },
+      "line": 0,
+      "functionName": "edge_crop_write",
+      "matchedText": "step(edge_crop) is dealing with page -> imgin  : FRONT w 2496 h 3520 s 7488 d 24 f 201 | step(edge_crop) is dealing with page -> imgout : FRONT w 2480 h 3520 s 7440 d 24 f 201",
+      "keywords": [
+        "step(edge_crop)",
+        "front"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "u5",
+      "codeFile": {
+        "fileName": "scan_pu.cpp"
+      },
+      "line": 0,
+      "functionName": "releaseFrameResource",
+      "matchedText": "scan_pu: FrameResources released, active count: 0",
+      "keywords": [
+        "scan_pu:",
+        "frameresources",
+        "released"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "u6",
+      "codeFile": {
+        "fileName": "scan_pu.cpp"
+      },
+      "line": 0,
+      "functionName": "pipe_core_run_this_step",
+      "matchedText": "EOI from scan_pu_step",
+      "keywords": [
+        "eoi",
+        "scan_pu_step"
+      ],
+      "level": "INFO"
+    }
+  ]
+}

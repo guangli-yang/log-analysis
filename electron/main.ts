@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog, Menu } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
+import { execFile } from 'child_process'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -126,6 +127,16 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
+
+  // 拦截 Ctrl+F / Ctrl+G：在主进程输入事件层用物理键码（input.code，不受输入法/大小写影响）
+  // 抢先 preventDefault，避免触发 Electron/Chromium 默认行为，并转发给渲染进程打开对应对话框。
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if ((input.control || input.meta) && (input.code === 'KeyF' || input.code === 'KeyG')) {
+      event.preventDefault()
+      const channel = input.code === 'KeyF' ? 'shortcut:open-search' : 'shortcut:goto-line'
+      mainWindow?.webContents.send(channel)
+    }
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -406,38 +417,162 @@ const MAX_FILES = 2000
 const MAX_RESULTS = 5000
 const BATCH_SIZE = 20
 
-function getFunctionName(line: string, content: string, lineIndex: number): string {
-  let functionName = ''
-  
-  const funcPatterns = [
-    /\b(?:function\s+(\w+)|(\w+)\s*=\s*function|\b(?:async\s+)?function\s*(\w+)|(\w+)\s*\(\s*\)\s*=>)/,
-    /\b(?:class\s+(\w+))/,
-    /\b(?:public\s+|private\s+|protected\s+)?(?:static\s+)?(?:void\s+|int\s+|String\s+|boolean\s+|float\s+|double\s+)?(\w+)\s*\(/
-  ]
+// ═══════════════════════════════════════════════════
+//  ctags 集成 — 编译器级函数名索引
+// ═══════════════════════════════════════════════════
 
-  const match = funcPatterns.find(p => p.test(line))
-  if (match) {
-    const result = line.match(match)
-    if (result) {
-      functionName = result.slice(1).find(Boolean) || ''
+/** 获取 ctags 可执行文件路径（开发/生产自动切换） */
+function getCtagsPath(): string {
+  const platform = process.platform
+  const base = app.isPackaged
+    ? path.join(process.resourcesPath, 'ctags')
+    : path.join(__dirname, '../../resources/ctags')
+  return platform === 'win32' ? path.join(base, 'ctags.exe') : path.join(base, 'ctags')
+}
+
+/**
+ * 使用 ctags 扫描源码根目录，构建全局函数索引。
+ * 返回 Map<文件绝对路径, Map<行号, 函数名>>
+ */
+function buildGlobalFuncMap(rootDir: string): Promise<Map<string, Map<number, string>>> {
+  return new Promise((resolve) => {
+    const map = new Map<string, Map<number, string>>()
+    const ctags = getCtagsPath()
+
+    if (!fs.existsSync(ctags)) {
+      console.warn(`ctags binary not found at: ${ctags}, falling back to regex-based parsing`)
+      resolve(map)
+      return
     }
-  }
 
-  if (!functionName && lineIndex > 0) {
-    for (let i = lineIndex - 1; i >= Math.max(0, lineIndex - 10); i--) {
-      const prevLine = content.split('\n')[i]
-      for (const pattern of funcPatterns) {
-        const result = prevLine.match(pattern)
-        if (result) {
-          functionName = result.slice(1).find(Boolean) || ''
-          if (functionName) break
-        }
+    execFile(ctags, [
+      '--sort=no',
+      '--kinds-C=+pf',
+      '--kinds-C++=+pf',
+      '--fields=+n',
+      '-R',
+      '-o', '-',
+      rootDir
+    ], { maxBuffer: 50 * 1024 * 1024, timeout: 60000 }, (err, stdout) => {
+      if (err) {
+        console.warn(`ctags scan failed for ${rootDir}:`, err.message)
+        resolve(map)
+        return
       }
-      if (functionName) break
-    }
+
+      // 解析 ctags 输出格式：funcName\tfilePath\t...\tline:123
+      const lines = stdout.split('\n')
+      for (const line of lines) {
+        // 提取函数名（第1列 和 第3列是函数名，第2列是文件路径）
+        const parts = line.split('\t')
+        if (parts.length < 3) continue
+
+        const funcName = parts[0]
+        const relPath = parts[1]
+
+        // 从 extras 字段提取行号 (格式: line:123)
+        const lineMatch = line.match(/line:(\d+)/)
+        if (!lineMatch) continue
+
+        const lineNum = parseInt(lineMatch[1], 10)
+        const absPath = path.resolve(rootDir, relPath)
+
+        if (!map.has(absPath)) {
+          map.set(absPath, new Map())
+        }
+        map.get(absPath)!.set(lineNum, funcName)
+      }
+
+      console.log(`ctags indexed ${map.size} files with functions in ${rootDir}`)
+      resolve(map)
+    })
+  })
+}
+
+/**
+ * 从单行代码中识别「函数定义」，返回非限定函数名（如 DispatchEvent / sendData）。
+ * 用于定位调用日志的父函数。返回 '' 表示该行不是函数定义。
+ */
+function extractFuncDef(lineText: string): string {
+  const t = lineText.trim()
+  if (t.length === 0) return ''
+
+  // 排除控制流关键字（这些不是函数定义）
+  if (/^\s*(if|for|while|switch|catch|do|else|return|throw|try|case|default)\b/.test(t)) return ''
+
+  // 排除日志宏 / 打印调用本身（避免出现 LOGE、console.log 等）
+  if (/(LOGE|LOGI|LOGW|LOGD|LOGC|LOG_PRINT|LOG_ERR|LOG_INFO|printf|fprintf|console\.log|NSLog|qDebug|qInfo|qWarning|android_print)\s*\(/.test(t)) return ''
+
+  // C/C++ 函数定义识别：支持返回类型(含模板/限定名)、ns::Class::method 限定名、
+  // 指针/引用返回、__attribute__/__declspec 装饰器(可出现在返回类型前后)、extern "C" 链接说明、
+  // template<>、尾置返回类型(auto f()->T)、成员初始化列表(:)、noexcept、
+  // =0/default/delete、operator 重载、const/override/final、以及 K&R 风格(大括号另起一行)。
+  // 例：void foo(int x) {   /   char *get_name(void) {   /   extern "C" void c_func(void) {
+  //     __declspec(dllexport) int win_func(void) {   /   void foo(void) __attribute__((noreturn)) {
+  //     MyClass::MyClass() : m_x(0) {   /   bool operator==(const Foo&) const {   /   template<typename T> void f() {
+  const deco = '(?:__attribute__|__declspec)\\s*\\((?:[^()]*|\\([^()]*\\))*\\)\\s*'
+  const cppRe = new RegExp(
+    '^(?:' + deco + '|template\\s*<[^>]*>\\s*|(?!(?:operator)\\b)[A-Za-z_"][\\w"]*\\s+)*' + // 修饰词/装饰器/template 循环(可出现在返回类型前后;operator 除外)
+    '(?:\\w+::)*' +                                    // 限定名 ns::Class::
+    '(?:[*&]\\s*)*' +                                  // 指针/引用修饰符
+    '((?:operator\\s*(?:[=<>!+\\-*/%&|^~()\\[\\]]+|\\w[\\w:<>&*\\s,\\[\\]]*?))|(?:\\w+))' + // 函数名 / operator(operator 优先)
+    '\\s*\\(([^()]*)\\)' +                             // 参数
+    '(?=[^;{]*[{=]|\\s*$)'                            // 零宽前瞻: 其后有 { 或 = (未被 ; 阻断)=>定义体/纯虚; 或参数后仅空白到行尾=>K&R 签名
+  )
+  let m = t.match(cppRe)
+  if (m) {
+    const name = (m[1] || '').replace(/\s+/g, ' ').trim()
+    if (name && !/^(if|for|while|switch|catch|return|throw)$/.test(name)) return name
   }
 
-  return functionName
+  // C/C++ 箭头/lambda 不算，跳过
+
+  // JS/TS: function name(...)
+  m = t.match(/\bfunction\s+(\w+)/)
+  if (m) return m[1]
+
+  // JS/TS: const name = (...) =>  /  let name = async (...) =>
+  m = t.match(/\b(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>/)
+  if (m) return m[1]
+
+  // JS/TS: name: function(...)  /  name = function(...)
+  m = t.match(/(\w+)\s*[:=]\s*function\b/)
+  if (m) return m[1]
+
+  // class 定义
+  m = t.match(/\bclass\s+(\w+)/)
+  if (m) return m[1]
+
+  return ''
+}
+
+/**
+ * 获取调用当前日志行的「父函数名」。
+ * 不再在日志打印行本身匹配（那会抓到 LOGE/console.log），而是向上/向下各扫描至多 500 行，
+ * 找到最近的函数定义，并兼容 C/C++ 与 JS/TS。
+ * 优先向上扫描（函数定义通常位于日志行上方），向上未命中时再向下兜底扫描。
+ */
+function getCallerFunctionName(line: string, content: string, lineIndex: number): string {
+  const lines = content.split('\n')
+  const total = lines.length
+  const SCAN_RANGE = 500 // 向上/向下扫描的最大行数
+
+  // 向上扫描：函数定义通常在日志行的上方
+  const upStart = Math.max(0, lineIndex)
+  const upEnd = Math.max(0, lineIndex - SCAN_RANGE)
+  for (let i = upStart; i >= upEnd; i--) {
+    const fn = extractFuncDef(lines[i])
+    if (fn) return fn
+  }
+
+  // 向上未找到时，向下扫描（兼容函数定义位于日志行下方的情况）
+  const downEnd = Math.min(total - 1, lineIndex + SCAN_RANGE)
+  for (let i = lineIndex + 1; i <= downEnd; i++) {
+    const fn = extractFuncDef(lines[i])
+    if (fn) return fn
+  }
+
+  return ''
 }
 
 async function* walkDirectoryAsync(dir: string): AsyncGenerator<string> {
@@ -483,7 +618,8 @@ function extractKeywords(staticStr: string): string[] {
 
 async function processFile(
   filePath: string,
-  enabledPatterns: Array<{ pattern: string; enabled: boolean; name: string }>
+  enabledPatterns: Array<{ pattern: string; enabled: boolean; name: string }>,
+  globalFuncMap: Map<string, Map<number, string>> | null
 ): Promise<Array<{
   fileName: string
   line: number
@@ -505,7 +641,8 @@ async function processFile(
     const content = await fs.promises.readFile(filePath, 'utf-8')
     const lines = content.split('\n')
     const fullPath = filePath
-    
+    const fileFuncs = globalFuncMap?.get(filePath) ?? null
+
     for (const patternInfo of enabledPatterns) {
       let regex: RegExp
       try {
@@ -518,10 +655,26 @@ async function processFile(
         const line = lines[lineIndex]
         if (regex.test(line)) {
           const staticStr = extractPrintStaticString(line)
+
+          // 查找函数名：优先 ctags 索引 O(1)，回退正则扫描
+          let funcName = ''
+          if (fileFuncs) {
+            // ctags 索引：向上查找最近的函数定义行
+            for (let j = lineIndex + 1; j >= 1; j--) {
+              if (fileFuncs.has(j)) {
+                funcName = fileFuncs.get(j)!
+                break
+              }
+            }
+          } else {
+            // 降级：使用正则扫描
+            funcName = getCallerFunctionName(line, content, lineIndex)
+          }
+
           results.push({
             fileName: fullPath,
             line: lineIndex + 1,
-            functionName: getFunctionName(line, content, lineIndex),
+            functionName: funcName,
             matchedPattern: patternInfo.name,
             matchedText: staticStr,
             keywords: extractKeywords(staticStr)
@@ -545,6 +698,10 @@ ipcMain.handle('select-code-folder', async (_, patterns: Array<{ pattern: string
     const folderPath = result.filePaths[0]
     const enabledPatterns = patterns.filter(p => p.enabled)
     
+    // 构建 ctags 全局函数索引
+    const globalFuncMap = await buildGlobalFuncMap(folderPath)
+    const useCtags = globalFuncMap.size > 0
+    
     const results: Array<{
       fileName: string
       line: number
@@ -565,7 +722,7 @@ ipcMain.handle('select-code-folder', async (_, patterns: Array<{ pattern: string
     for (let i = 0; i < filePaths.length; i += BATCH_SIZE) {
       const batch = filePaths.slice(i, i + BATCH_SIZE)
       const batchResults = await Promise.all(
-        batch.map(fp => processFile(fp, enabledPatterns))
+        batch.map(fp => processFile(fp, enabledPatterns, useCtags ? globalFuncMap : null))
       )
       
       for (const fileResults of batchResults) {

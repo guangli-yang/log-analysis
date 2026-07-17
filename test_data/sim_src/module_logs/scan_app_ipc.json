@@ -1,0 +1,66 @@
+{
+  "file": "scan_app_ipc.cpp",
+  "codeSearchResults": [
+    {
+      "id": "a1",
+      "codeFile": {
+        "fileName": "scan_app_ipc.cpp"
+      },
+      "line": 0,
+      "functionName": "ipc_receive_handler",
+      "matchedText": "bio_get_buffer.len :256 msg_type 112  | bio_get_buffer.len :256 msg_type 115 ",
+      "keywords": [
+        "bio_get_buffer.len",
+        "msg_type"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "a3",
+      "codeFile": {
+        "fileName": "scan_app_ipc.cpp"
+      },
+      "line": 0,
+      "functionName": "ScanMgrThread",
+      "matchedText": "msg from pcie: 112 256 | msg from pcie: 115 256",
+      "keywords": [
+        "msg",
+        "from",
+        "pcie"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "a4",
+      "codeFile": {
+        "fileName": "scan_app_ipc.cpp"
+      },
+      "line": 0,
+      "functionName": "ScanMgrCommandProcess",
+      "matchedText": "recv copy calc data 112 | recv copy calc data 115",
+      "keywords": [
+        "recv",
+        "copy",
+        "calc",
+        "data"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "a5",
+      "codeFile": {
+        "fileName": "scan_app_ipc.cpp"
+      },
+      "line": 0,
+      "functionName": "image_processing_manager_scan_thread",
+      "matchedText": "ipm recv Y cali data | ipm recv K cali data",
+      "keywords": [
+        "ipm",
+        "recv",
+        "cali",
+        "data"
+      ],
+      "level": "INFO"
+    }
+  ]
+}

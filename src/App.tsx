@@ -21,6 +21,7 @@ import RoleSelectionScreen, { UserRole } from './components/RoleSelectionScreen'
 import SettingsDialog from './components/SettingsDialog'
 import ContextMenu from './components/ContextMenu'
 import { logger, logCategories } from './utils/logger'
+import { deepMergeModuleLogs, deepMergeModuleMappings } from './utils/mergeData'
 import './App.css'
 
 const defaultErrorKeywords: ErrorKeyword[] = [
@@ -146,6 +147,10 @@ function App() {
   const [showLogExtract, setShowLogExtract] = useState(false)
   const [showLogMatchPanel, setShowLogMatchPanel] = useState(false)
   const [showImportDialog, setShowImportDialog] = useState(false)
+  // 数据管理：导入暂存（未提交到项目 JSON）与合并状态
+  const [stagedModuleLogs, setStagedModuleLogs] = useState<ModuleLog[]>([])
+  const [stagedModuleMappings, setStagedModuleMappings] = useState<ModuleMapping[]>([])
+  const [dmBusy, setDmBusy] = useState(false)
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -390,19 +395,27 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+      if (!(e.ctrlKey || e.metaKey)) return
+      if (e.code === 'KeyG') {
         e.preventDefault()
-        if (currentFile) {
-          setShowGoToLine(true)
-        }
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        if (currentFile) setShowGoToLine(true)
+      } else if (e.code === 'KeyF') {
         e.preventDefault()
         setShowSearchDialog(true)
       }
     }
+    // 捕获阶段监听，抢在输入框 / Electron 默认行为之前
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
+  }, [currentFile])
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+  // 主进程 before-input-event 转发过来的快捷键（物理键码，覆盖输入法/大小写/布局场景）
+  useEffect(() => {
+    const api = window.electronAPI
+    if (!api?.on) return
+    const offSearch = api.on('shortcut:open-search', () => setShowSearchDialog(true))
+    const offGoto = api.on('shortcut:goto-line', () => { if (currentFile) setShowGoToLine(true) })
+    return () => { offSearch(); offGoto() }
   }, [currentFile])
 
   const handleOpenFile = async () => {
@@ -835,14 +848,14 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'z') {
+      if (e.ctrlKey && e.code === 'KeyZ') {
         e.preventDefault()
         handleUndo()
       }
     }
-    
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => window.removeEventListener('keydown', handleKeyDown, true)
   }, [handleUndo])
 
   const handleHighlightLine = (lineNumber: number) => {
@@ -1124,6 +1137,135 @@ function App() {
     }
   }, [ensureProject, switchProject])
 
+  // ========== 模块数据：导入（暂存）与合并（深度合并）拆分 ==========
+  // 导入：仅接收、解析并暂存到内存，不直接改动项目 JSON
+  const handleStageImportModuleLog = useCallback(async () => {
+    logger.info(logCategories.ANALYSIS, '暂存导入模块日志（未提交）')
+    try {
+      const results = await window.electronAPI.selectImportConfig()
+      if (!results || results.length === 0) return
+
+      const parsed: ModuleLog[] = results.map((fileResult) => {
+        const rawName = fileResult.fileName || fileResult.filePath.split(/[\\/]/).pop() || '未知模块'
+        const name = rawName.replace(/\.json$/i, '')
+        const content = fileResult.content || ''
+        let lineCount = 0
+        try {
+          const p = JSON.parse(content)
+          const arr = Array.isArray(p) ? p : (p.codeSearchResults || (p.data && p.data.searchResults) || [])
+          lineCount = Array.isArray(arr) ? arr.length : 0
+        } catch {
+          lineCount = content.split('\n').length
+        }
+        return {
+          id: `module_${name}`,
+          name,
+          filePath: fileResult.filePath,
+          content,
+          lineCount,
+          importedAt: Date.now()
+        }
+      })
+
+      setStagedModuleLogs(prev => deepMergeModuleLogs(prev, parsed))
+      setNotification(`已暂存 ${parsed.length} 个模块日志，待合并到项目「${activeProject || '（未选择）'}」`)
+    } catch (err) {
+      console.error('Stage import module log error:', err)
+      setNotification('导入模块日志失败')
+    }
+  }, [activeProject])
+
+  // 合并：将暂存数据深度合并到当前项目的现存 JSON
+  const handleMergeModuleLog = useCallback(async () => {
+    if (stagedModuleLogs.length === 0) {
+      setNotification('没有待合并的模块日志，请先导入')
+      return
+    }
+    if (!activeProject) {
+      setNotification('请先选择或创建项目')
+      return
+    }
+    logger.info(logCategories.ANALYSIS, '深度合并模块日志', `项目: ${activeProject}`)
+    setDmBusy(true)
+    try {
+      const existing = await window.electronAPI.loadProjectData(activeProject)
+      const merged = deepMergeModuleLogs(existing?.moduleLogs || [], stagedModuleLogs)
+      await window.electronAPI.saveProjectData(activeProject, {
+        moduleLogs: merged,
+        moduleMappings: existing?.moduleMappings || []
+      })
+      await switchProject(activeProject)
+      setStagedModuleLogs([])
+      setNotification(`深度合并完成：项目「${activeProject}」现有 ${merged.length} 个模块日志`)
+    } catch (err) {
+      console.error('Merge module log error:', err)
+      setNotification('合并模块日志失败')
+    } finally {
+      setDmBusy(false)
+    }
+  }, [stagedModuleLogs, activeProject, switchProject])
+
+  const handleStageImportModuleMapping = useCallback(async () => {
+    logger.info(logCategories.ANALYSIS, '暂存导入模块映射表（未提交）')
+    try {
+      const result = await window.electronAPI.importConfig()
+      if (result.success && result.config) {
+        const config = result.config as any
+        const rawMappings = config.mappings || (config.data && config.data.moduleMappings) || (Array.isArray(config) ? config : null)
+        if (rawMappings && Array.isArray(rawMappings)) {
+          const mappings: ModuleMapping[] = rawMappings.map((m: any) => ({
+            codePath: m.codePath || '',
+            moduleName: m.moduleName || '',
+            contactName: m.contactName || ''
+          }))
+          setStagedModuleMappings(prev => deepMergeModuleMappings(prev, mappings))
+          setNotification(`已暂存 ${mappings.length} 条映射关系，待合并到项目「${activeProject || '（未选择）'}」`)
+        } else {
+          setNotification('文件格式无效：缺少 mappings 字段')
+        }
+      } else if (result.reason === 'cancelled') {
+        // 用户取消
+      } else {
+        setNotification('导入映射表失败')
+      }
+    } catch (err) {
+      console.error('Stage import module mapping error:', err)
+      setNotification('导入映射表失败')
+    }
+  }, [activeProject])
+
+  const handleMergeModuleMapping = useCallback(async () => {
+    if (stagedModuleMappings.length === 0) {
+      setNotification('没有待合并的映射表，请先导入')
+      return
+    }
+    if (!activeProject) {
+      setNotification('请先选择或创建项目')
+      return
+    }
+    logger.info(logCategories.ANALYSIS, '深度合并模块映射表', `项目: ${activeProject}`)
+    setDmBusy(true)
+    try {
+      const existing = await window.electronAPI.loadProjectData(activeProject)
+      const merged = deepMergeModuleMappings(existing?.moduleMappings || [], stagedModuleMappings)
+      await window.electronAPI.saveProjectData(activeProject, {
+        moduleLogs: existing?.moduleLogs || [],
+        moduleMappings: merged
+      })
+      await switchProject(activeProject)
+      setStagedModuleMappings([])
+      setNotification(`深度合并完成：项目「${activeProject}」现有 ${merged.length} 条映射关系`)
+    } catch (err) {
+      console.error('Merge module mapping error:', err)
+      setNotification('合并映射表失败')
+    } finally {
+      setDmBusy(false)
+    }
+  }, [stagedModuleMappings, activeProject, switchProject])
+
+  const handleClearStagedModuleLogs = useCallback(() => setStagedModuleLogs([]), [])
+  const handleClearStagedModuleMappings = useCallback(() => setStagedModuleMappings([]), [])
+
   const handleFilterComplete = useCallback(async (filteredContent: string, filteredFileName: string, removedCount: number) => {
     if (!currentFile) return
 
@@ -1369,14 +1511,21 @@ function App() {
           activeProject={activeProject}
           moduleLogs={moduleLogs}
           moduleMappings={moduleMappings}
+          stagedModuleLogs={stagedModuleLogs}
+          stagedModuleMappings={stagedModuleMappings}
+          isBusy={dmBusy}
           onSwitchProject={switchProject}
           onCreateProject={handleCreateProject}
           onDeleteProject={handleDeleteProject}
           onChangeModuleMappings={setModuleMappings}
           onRemoveModuleLog={handleRemoveModuleLog}
           onUpdateModuleLog={handleUpdateModuleLog}
-          onImportModuleLog={(mode) => handleImportModuleLog(activeProject, mode)}
-          onImportModuleMapping={(mode) => handleImportModuleMapping(activeProject, mode)}
+          onStageImportModuleLog={handleStageImportModuleLog}
+          onMergeModuleLog={handleMergeModuleLog}
+          onStageImportModuleMapping={handleStageImportModuleMapping}
+          onMergeModuleMapping={handleMergeModuleMapping}
+          onClearStagedModuleLogs={handleClearStagedModuleLogs}
+          onClearStagedModuleMappings={handleClearStagedModuleMappings}
           onShowNotification={setNotification}
           onClose={() => setShowDataManagement(false)}
         />

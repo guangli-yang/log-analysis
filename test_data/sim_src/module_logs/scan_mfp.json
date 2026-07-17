@@ -1,0 +1,74 @@
+{
+  "file": "scan_mfp.cpp",
+  "codeSearchResults": [
+    {
+      "id": "s1",
+      "codeFile": {
+        "fileName": "scan_mfp.cpp"
+      },
+      "line": 0,
+      "functionName": "scan_parser_thread",
+      "matchedText": "SCAN_PARSER_STATE_JOB | SCAN_PARSER_STATE_JOB",
+      "keywords": [
+        "scan_parser_state_job"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "s2",
+      "codeFile": {
+        "fileName": "scan_mfp.cpp"
+      },
+      "line": 0,
+      "functionName": "scan_parser_host_message_process",
+      "matchedText": "no data | no data",
+      "keywords": [
+        "no",
+        "data"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "s4",
+      "codeFile": {
+        "fileName": "scan_mfp.cpp"
+      },
+      "line": 0,
+      "functionName": "mode_answer_0x4D_callback_func",
+      "matchedText": "PAGE_ON signal  [0==>1] ",
+      "keywords": [
+        "page_on",
+        "signal"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "s5",
+      "codeFile": {
+        "fileName": "scan_mfp.cpp"
+      },
+      "line": 0,
+      "functionName": "debug_printf_recv_cmd",
+      "matchedText": "[808.975] SCAN_ENG ADF=>CTL [9c-57-03-74-7f-]",
+      "keywords": [
+        "scan_eng",
+        "adf"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "s6",
+      "codeFile": {
+        "fileName": "scan_mfp.cpp"
+      },
+      "line": 0,
+      "functionName": "mode_answer_0x57_callback_func",
+      "matchedText": "0x9c 0x57 0x03 0x74 0x7f ",
+      "keywords": [
+        "0x9c",
+        "0x57"
+      ],
+      "level": "INFO"
+    }
+  ]
+}

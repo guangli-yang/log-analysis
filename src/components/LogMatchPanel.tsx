@@ -1,5 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { CodeSearchResult, ModuleLog, MatchSummary, MatchResult, ModuleMapping } from '../types'
+import { matchModuleAgainstLog } from '../utils/logMatch'
+import ThinkingOverlay from './ThinkingOverlay'
 import './AnalysisPanel.css'
 
 interface LogMatchPanelProps {
@@ -23,6 +25,7 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
 }) => {
   const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([])
   const [matchSummary, setMatchSummary] = useState<MatchSummary | null>(null)
+  const [isMatching, setIsMatching] = useState(false)
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const [position, setPosition] = useState({ x: window.innerWidth - 470, y: 120 })
   const [isDragging, setIsDragging] = useState(false)
@@ -53,7 +56,7 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
     }
   }
 
-  const handleMatch = () => {
+  const handleMatch = async () => {
     if (selectedModuleIds.length === 0) return
 
     if (moduleMappings.length === 0) {
@@ -61,151 +64,99 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
       return
     }
 
-    const selectedModules = moduleLogs.filter(m => selectedModuleIds.includes(m.id))
-    const matchResults: MatchResult[] = []
-    const matchedCodePaths = new Set<string>()
-    const mainLogLines = content.split('\n')
+    // 显示“思考中”遮罩，并让出事件循环以便遮罩先渲染
+    setIsMatching(true)
+    await new Promise(resolve => setTimeout(resolve, 20))
 
-    selectedModules.forEach(moduleLog => {
-      let codeSearchResults: CodeSearchResult[] = []
+    try {
+      const selectedModules = moduleLogs.filter(m => selectedModuleIds.includes(m.id))
+      const matchResults: MatchResult[] = []
+      const matchedCodePaths = new Set<string>()
+      const mainLogLines = content.split('\n')
 
-      try {
-        const parsed = JSON.parse(moduleLog.content)
-        if (Array.isArray(parsed)) {
-          codeSearchResults = parsed
-        } else if (parsed.codeSearchResults && Array.isArray(parsed.codeSearchResults)) {
-          codeSearchResults = parsed.codeSearchResults
-        }
-      } catch (e) {
-        console.error('Failed to parse module log content:', e)
-      }
+      selectedModules.forEach(moduleLog => {
+        const moduleMatches = matchModuleAgainstLog(moduleLog, mainLogLines)
+        moduleMatches.forEach(({ candidate, lines }) => {
+          if (lines.length === 0) return
 
-      if (codeSearchResults.length === 0) return
-
-      const allPatterns: Array<{ line: number; staticStr: string; codePath: string; keywords: string[] }> = codeSearchResults.map(r => ({
-        line: r.line,
-        staticStr: r.matchedText || '',
-        codePath: r.codeFile?.fileName || '',
-        keywords: r.keywords || []
-      }))
-
-      if (allPatterns.length > 0) {
-        const matchedLines: Array<{ lineNumber: number; lineText: string }> = []
-
-        mainLogLines.forEach((mainLine, mainIndex) => {
-          const mainMatch = mainLine.match(/L(\d+)[:：]?\s*(.*)/)
-          if (mainMatch) {
-            const mainSourceLine = parseInt(mainMatch[1], 10)
-            const mainContent = mainMatch[2].trim()
-
-            const matchedPattern = allPatterns.find(p => {
-              if (p.line !== mainSourceLine) return false
-
-              // 优先使用关键词匹配（新数据）
-              let kwList = p.keywords || []
-
-              // 兼容旧数据：如果没有关键词，从 staticStr 动态提取
-              if (kwList.length === 0 && p.staticStr) {
-                kwList = p.staticStr
-                  .replace(/\s+/g, ' ')
-                  .trim()
-                  .split(/\s+/)
-                  .filter(k => k.length > 0)
-              }
-
-              if (kwList.length > 0) {
-                const lowerContent = mainContent.toLowerCase()
-                return kwList.every(kw => lowerContent.includes(kw.toLowerCase()))
-              }
-
-              // 最后兜底：staticStr 为空也不匹配
-              return false
-            })
-
-            if (matchedPattern) {
-              matchedLines.push({
-                lineNumber: mainIndex + 1,
-                lineText: mainLine
-              })
-              if (matchedPattern.codePath) {
-                matchedCodePaths.add(matchedPattern.codePath)
-              }
-            }
-          }
-        })
-
-        if (matchedLines.length > 0) {
+          const codePath = candidate.codeFile?.fileName || moduleLog.name
           const dummyCodeResult: CodeSearchResult = {
-            codeFile: { fileName: moduleLog.name },
-            line: 0,
-            functionName: '',
-            matchedPattern: '精确匹配',
-            matchedText: `共 ${matchedLines.length} 处匹配`
+            codeFile: { fileName: codePath },
+            line: candidate.line,
+            functionName: candidate.functionName || '',
+            matchedPattern: candidate.matchedPattern || '精确匹配',
+            matchedText: candidate.matchedText || `共 ${lines.length} 处匹配`,
+            keywords: candidate.keywords
           }
           matchResults.push({
             codeResult: dummyCodeResult,
             moduleLog,
-            matchedLines
+            matchedLines: lines
           })
-        }
-      }
-    })
-
-    if (matchResults.length === 0) {
-      onShowNotification('未在日志中找到匹配的模块日志')
-      return
-    }
-
-    const normalizePath = (p: string) => p.replace(/\\/g, '/')
-
-    const isPathSegmentMatch = (codePath: string, mappingPath: string): boolean => {
-      const normalizedCodePath = normalizePath(codePath)
-      const normalizedMappingPath = normalizePath(mappingPath)
-
-      const index = normalizedCodePath.indexOf(normalizedMappingPath)
-      if (index === -1) return false
-
-      const before = index === 0 ? '/' : normalizedCodePath[index - 1]
-      const afterIndex = index + normalizedMappingPath.length
-      const after = afterIndex >= normalizedCodePath.length ? '/' : normalizedCodePath[afterIndex]
-
-      const beforeValid = before === '/' || before === '\\'
-      const afterValid = after === '/' || after === '\\' || afterIndex >= normalizedCodePath.length
-
-      return beforeValid && afterValid
-    }
-
-    const mappingContactInfo: Array<{ moduleName: string; contactName: string }> = []
-    const seenContactInfo = new Set<string>()
-    matchedCodePaths.forEach(codePath => {
-      // 获取所有匹配的映射（不再只取第一个）
-      const matchedMappings = moduleMappings.filter(m => isPathSegmentMatch(codePath, m.codePath))
-      matchedMappings.forEach(mapping => {
-        const key = `${mapping.contactName}-${mapping.moduleName}`
-        if (!seenContactInfo.has(key)) {
-          seenContactInfo.add(key)
-          mappingContactInfo.push({
-            moduleName: mapping.moduleName,
-            contactName: mapping.contactName
-          })
-        }
+          if (candidate.codeFile?.fileName) {
+            matchedCodePaths.add(candidate.codeFile.fileName)
+          }
+        })
       })
-    })
 
-    if (mappingContactInfo.length === 0) {
-      onShowNotification('匹配到的文件路径未找到对应的模块负责人，请检查映射表配置')
-      return
+      if (matchResults.length === 0) {
+        onShowNotification('未在日志中找到匹配的模块日志')
+        return
+      }
+
+      const normalizePath = (p: string) => p.replace(/\\/g, '/')
+
+      const isPathSegmentMatch = (codePath: string, mappingPath: string): boolean => {
+        const normalizedCodePath = normalizePath(codePath)
+        const normalizedMappingPath = normalizePath(mappingPath)
+
+        const index = normalizedCodePath.indexOf(normalizedMappingPath)
+        if (index === -1) return false
+
+        const before = index === 0 ? '/' : normalizedCodePath[index - 1]
+        const afterIndex = index + normalizedMappingPath.length
+        const after = afterIndex >= normalizedCodePath.length ? '/' : normalizedCodePath[afterIndex]
+
+        const beforeValid = before === '/' || before === '\\'
+        const afterValid = after === '/' || after === '\\' || afterIndex >= normalizedCodePath.length
+
+        return beforeValid && afterValid
+      }
+
+      const mappingContactInfo: Array<{ moduleName: string; contactName: string }> = []
+      const seenContactInfo = new Set<string>()
+      matchedCodePaths.forEach(codePath => {
+        // 获取所有匹配的映射（不再只取第一个）
+        const matchedMappings = moduleMappings.filter(m => isPathSegmentMatch(codePath, m.codePath))
+        matchedMappings.forEach(mapping => {
+          const key = `${mapping.contactName}-${mapping.moduleName}`
+          if (!seenContactInfo.has(key)) {
+            seenContactInfo.add(key)
+            mappingContactInfo.push({
+              moduleName: mapping.moduleName,
+              contactName: mapping.contactName
+            })
+          }
+        })
+      })
+
+      if (mappingContactInfo.length === 0) {
+        onShowNotification('匹配到的文件路径未找到对应的模块负责人，请检查映射表配置')
+        return
+      }
+
+      const summary: MatchSummary = {
+        totalMatches: matchResults.reduce((sum, r) => sum + r.matchedLines.length, 0),
+        moduleCount: selectedModules.length,
+        patternCount: 1,
+        results: matchResults,
+        contactInfo: mappingContactInfo
+      }
+
+      setMatchSummary(summary)
+    } finally {
+      setIsMatching(false)
     }
-
-    const summary: MatchSummary = {
-      totalMatches: matchResults.reduce((sum, r) => sum + r.matchedLines.length, 0),
-      moduleCount: selectedModules.length,
-      patternCount: 1,
-      results: matchResults,
-      contactInfo: mappingContactInfo
-    }
-
-    setMatchSummary(summary)
   }
 
   const handleClearMatchResults = () => {
@@ -445,6 +396,7 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
                                       <span
                                         key={lineIndex}
                                         className="match-line-tag"
+                                        title={`代码: ${line.codeText || '—'} | 函数: ${line.functionName || '未知'} | 源码行: ${line.codeLine ?? '—'}`}
                                         onClick={(e) => {
                                           e.stopPropagation()
                                           onNavigateToError(line.lineNumber - 1)
@@ -527,6 +479,7 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
           </>
         )}
       </div>
+      <ThinkingOverlay show={isMatching} title="正在快速分析…" subtitle="正在匹配日志与代码模块，请稍候" />
     </div>
   )
 }

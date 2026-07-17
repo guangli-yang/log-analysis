@@ -1,0 +1,73 @@
+.thinking-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+.thinking-box {
+  background: #1e1e2e;
+  border: 1px solid #3a3a4d;
+  border-radius: 12px;
+  padding: 28px 36px;
+  text-align: center;
+  color: #e6e6e6;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  min-width: 260px;
+}
+
+.thinking-spinner {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.thinking-spinner span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4dabf7;
+  animation: thinking-bounce 1.2s infinite ease-in-out;
+}
+
+.thinking-spinner span:nth-child(2) {
+  animation-delay: 0.15s;
+  background: #69db7c;
+}
+
+.thinking-spinner span:nth-child(3) {
+  animation-delay: 0.3s;
+  background: #ffd43b;
+}
+
+.thinking-spinner span:nth-child(4) {
+  animation-delay: 0.45s;
+  background: #ff8787;
+}
+
+@keyframes thinking-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.thinking-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.thinking-subtitle {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #a0a0b0;
+}

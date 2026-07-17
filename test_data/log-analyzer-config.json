@@ -1,0 +1,89 @@
+{
+  "codeSearchResults": [
+    {
+      "codeFile": {
+        "fileName": "C:\\Users\\PANTUM\\Desktop\\Log-Analyzer\\test_data\\sim_src\\edge_cases.cpp"
+      },
+      "line": 24,
+      "functionName": "longLineLogger",
+      "matchedPattern": "log_emit_e",
+      "matchedText": "ERROR",
+      "keywords": [
+        "ERROR"
+      ]
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\Users\\PANTUM\\Desktop\\Log-Analyzer\\test_data\\sim_src\\edge_cases.cpp"
+      },
+      "line": 40,
+      "functionName": "warnFunc",
+      "matchedPattern": "log_emit_e",
+      "matchedText": "WARN",
+      "keywords": [
+        "WARN"
+      ]
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\Users\\PANTUM\\Desktop\\Log-Analyzer\\test_data\\sim_src\\pcie_data.cpp"
+      },
+      "line": 8,
+      "functionName": "recv_pcie_data_cb",
+      "matchedPattern": "log_emit_e",
+      "matchedText": "DEBUG",
+      "keywords": [
+        "DEBUG"
+      ]
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\Users\\PANTUM\\Desktop\\Log-Analyzer\\test_data\\sim_src\\pcie_data.cpp"
+      },
+      "line": 13,
+      "functionName": "usbd_pack_success",
+      "matchedPattern": "log_emit_e",
+      "matchedText": "INFO",
+      "keywords": [
+        "INFO"
+      ]
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\Users\\PANTUM\\Desktop\\Log-Analyzer\\test_data\\sim_src\\pcie_data.cpp"
+      },
+      "line": 18,
+      "functionName": "mfp_3588_data_proc",
+      "matchedPattern": "log_emit_e",
+      "matchedText": "DEBUG",
+      "keywords": [
+        "DEBUG"
+      ]
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\Users\\PANTUM\\Desktop\\Log-Analyzer\\test_data\\sim_src\\scan_pu.cpp"
+      },
+      "line": 8,
+      "functionName": "WrapperOutputToStep",
+      "matchedPattern": "log_emit_e",
+      "matchedText": "DEBUG",
+      "keywords": [
+        "DEBUG"
+      ]
+    },
+    {
+      "codeFile": {
+        "fileName": "C:\\Users\\PANTUM\\Desktop\\Log-Analyzer\\test_data\\sim_src\\scan_pu.cpp"
+      },
+      "line": 12,
+      "functionName": "sendNext",
+      "matchedPattern": "log_emit_e",
+      "matchedText": "DEBUG",
+      "keywords": [
+        "DEBUG"
+      ]
+    }
+  ],
+  "exportedAt": "2026-07-15T07:33:12.082Z"
+}

@@ -24,7 +24,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteProject: (name: string) => ipcRenderer.invoke('delete-project', name),
   renameProject: (oldName: string, newName: string) => ipcRenderer.invoke('rename-project', oldName, newName),
   loadProjectData: (name: string) => ipcRenderer.invoke('load-project-data', name),
-  saveProjectData: (name: string, data: any) => ipcRenderer.invoke('save-project-data', name, data)
+  saveProjectData: (name: string, data: any) => ipcRenderer.invoke('save-project-data', name, data),
+  // 供主进程 before-input-event 转发快捷键等场景使用：订阅主进程消息，返回取消订阅函数
+  on: (channel: string, callback: (...args: any[]) => void) => {
+    const subscription = (_event: unknown, ...args: any[]) => callback(...args)
+    ipcRenderer.on(channel, subscription)
+    return () => { ipcRenderer.removeListener(channel, subscription) }
+  }
 })
 
 export interface ExportResult {
@@ -66,7 +72,8 @@ declare global {
       deleteProject: (name: string) => Promise<{ success: boolean; error?: string }>
       renameProject: (oldName: string, newName: string) => Promise<{ success: boolean; name?: string; error?: string }>
       loadProjectData: (name: string) => Promise<{ success: boolean; moduleLogs: any[]; moduleMappings: any[]; error?: string }>
-      saveProjectData: (name: string, data: { moduleLogs?: any[]; moduleMappings?: any[] }) => Promise<{ success: boolean; error?: string }>
+      saveProjectData: (name: string, data: { moduleLogs?: any[]; moduleMappings?: any[] }) => Promise<{ success: boolean; error?: string }>,
+      on: (channel: string, callback: (...args: any[]) => void) => () => void
     }
   }
 }

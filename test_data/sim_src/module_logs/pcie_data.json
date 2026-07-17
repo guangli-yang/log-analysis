@@ -1,0 +1,51 @@
+{
+  "file": "pcie_data.cpp",
+  "codeSearchResults": [
+    {
+      "id": "c1",
+      "codeFile": {
+        "fileName": "pcie_data.cpp"
+      },
+      "line": 0,
+      "functionName": "recv_pcie_data_cb",
+      "matchedText": "Successfully sent data to USB panel, size: 0 | Successfully sent data to USB panel, size: 0",
+      "keywords": [
+        "successfully",
+        "sent",
+        "data",
+        "usb",
+        "panel"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "c2",
+      "codeFile": {
+        "fileName": "pcie_data.cpp"
+      },
+      "line": 0,
+      "functionName": "usbd_pack_success",
+      "matchedText": "usbd_pack_success endpoint=0  com=0x83 | usbd_pack_success endpoint=0  com=0x82",
+      "keywords": [
+        "usbd_pack_success",
+        "endpoint"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "c4",
+      "codeFile": {
+        "fileName": "pcie_data.cpp"
+      },
+      "line": 0,
+      "functionName": "mfp_3588_data_proc",
+      "matchedText": "Received 3588 data: header=0x02000004, type=4, value=0, res_type=2, data_len=80",
+      "keywords": [
+        "received",
+        "3588",
+        "data"
+      ],
+      "level": "DEBUG"
+    }
+  ]
+}

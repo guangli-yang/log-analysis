@@ -36,6 +36,8 @@ interface ElectronAPI {
   renameProject: (oldName: string, newName: string) => Promise<{ success: boolean; name?: string; error?: string }>
   loadProjectData: (name: string) => Promise<{ success: boolean; moduleLogs: ProjectModuleLog[]; moduleMappings: ProjectModuleMapping[]; error?: string }>
   saveProjectData: (name: string, data: { moduleLogs?: ProjectModuleLog[]; moduleMappings?: ProjectModuleMapping[] }) => Promise<{ success: boolean; error?: string }>
+  // 订阅主进程消息（如 before-input-event 转发的快捷键），返回取消订阅函数
+  on: (channel: string, callback: (...args: any[]) => void) => () => void
 }
 
 interface ProjectModuleLog {

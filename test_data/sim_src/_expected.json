@@ -1,0 +1,447 @@
+{
+  "expectedById": {
+    "j1": [
+      4
+    ],
+    "j2": [
+      5
+    ],
+    "j3": [
+      6
+    ],
+    "s1": [
+      7,
+      9
+    ],
+    "s2": [
+      8,
+      13
+    ],
+    "s4": [
+      10
+    ],
+    "s5": [
+      11
+    ],
+    "s6": [
+      12
+    ],
+    "p1": [
+      14
+    ],
+    "p2": [
+      15
+    ],
+    "c1": [
+      16,
+      20
+    ],
+    "c2": [
+      17,
+      18
+    ],
+    "c4": [
+      19
+    ],
+    "v1": [
+      21
+    ],
+    "v2": [
+      22
+    ],
+    "v3": [
+      23,
+      24
+    ],
+    "v5": [
+      25
+    ],
+    "v6": [
+      26
+    ],
+    "m1": [
+      27,
+      32
+    ],
+    "m2": [
+      28
+    ],
+    "m3": [
+      29
+    ],
+    "m4": [
+      30
+    ],
+    "m5": [
+      31
+    ],
+    "u1": [
+      33
+    ],
+    "u2": [
+      34
+    ],
+    "u3": [
+      35,
+      36
+    ],
+    "u5": [
+      37
+    ],
+    "u6": [
+      38
+    ],
+    "a1": [
+      39,
+      40
+    ],
+    "a3": [
+      41,
+      44
+    ],
+    "a4": [
+      42,
+      45
+    ],
+    "a5": [
+      43,
+      46
+    ],
+    "e1": [
+      47
+    ],
+    "e2": [
+      48
+    ],
+    "e3": [
+      49
+    ],
+    "e4": [
+      50
+    ],
+    "e5": [
+      51
+    ],
+    "e6": [
+      52
+    ],
+    "e7": [
+      53
+    ],
+    "e8": [
+      54
+    ],
+    "e9": [
+      55
+    ],
+    "t1": [
+      56
+    ],
+    "t2": [
+      57
+    ]
+  },
+  "metaById": {
+    "j1": {
+      "expect": "match",
+      "note": "",
+      "file": "job_manager.cpp",
+      "func": "jobRun",
+      "line": 1192
+    },
+    "j2": {
+      "expect": "match",
+      "note": "",
+      "file": "job_manager.cpp",
+      "func": "jobRun",
+      "line": 1201
+    },
+    "j3": {
+      "expect": "match",
+      "note": "",
+      "file": "job_manager.cpp",
+      "func": "jobRun",
+      "line": 1215
+    },
+    "s1": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_mfp.cpp",
+      "func": "scan_parser_thread",
+      "line": 0
+    },
+    "s2": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_mfp.cpp",
+      "func": "scan_parser_host_message_process",
+      "line": 0
+    },
+    "s4": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_mfp.cpp",
+      "func": "mode_answer_0x4D_callback_func",
+      "line": 0
+    },
+    "s5": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_mfp.cpp",
+      "func": "debug_printf_recv_cmd",
+      "line": 0
+    },
+    "s6": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_mfp.cpp",
+      "func": "mode_answer_0x57_callback_func",
+      "line": 0
+    },
+    "p1": {
+      "expect": "match",
+      "note": "",
+      "file": "print_event.cpp",
+      "func": "print_info_event_outside_process",
+      "line": 335
+    },
+    "p2": {
+      "expect": "match",
+      "note": "",
+      "file": "print_event.cpp",
+      "func": "print_relay_send_page_to_relay_read",
+      "line": 796
+    },
+    "c1": {
+      "expect": "match",
+      "note": "",
+      "file": "pcie_data.cpp",
+      "func": "recv_pcie_data_cb",
+      "line": 0
+    },
+    "c2": {
+      "expect": "match",
+      "note": "",
+      "file": "pcie_data.cpp",
+      "func": "usbd_pack_success",
+      "line": 0
+    },
+    "c4": {
+      "expect": "match",
+      "note": "",
+      "file": "pcie_data.cpp",
+      "func": "mfp_3588_data_proc",
+      "line": 0
+    },
+    "v1": {
+      "expect": "match",
+      "note": "",
+      "file": "video_pipeline.cpp",
+      "func": "video_pcie_cancel_process",
+      "line": 649
+    },
+    "v2": {
+      "expect": "match",
+      "note": "",
+      "file": "video_pipeline.cpp",
+      "func": "video_driver_cancel_process",
+      "line": 777
+    },
+    "v3": {
+      "expect": "match",
+      "note": "",
+      "file": "video_pipeline.cpp",
+      "func": "video_del_all_page_from_list",
+      "line": 78
+    },
+    "v5": {
+      "expect": "match",
+      "note": "",
+      "file": "video_pipeline.cpp",
+      "func": "video_free",
+      "line": 148
+    },
+    "v6": {
+      "expect": "match",
+      "note": "",
+      "file": "video_pipeline.cpp",
+      "func": "video_pcie_band_alloc_suspend",
+      "line": 423
+    },
+    "m1": {
+      "expect": "match",
+      "note": "",
+      "file": "CViewModelBase.cpp",
+      "func": "DispatchEvent",
+      "line": 137
+    },
+    "m2": {
+      "expect": "match",
+      "note": "",
+      "file": "CViewModelBase.cpp",
+      "func": "DispatchEvent",
+      "line": 176
+    },
+    "m3": {
+      "expect": "match",
+      "note": "",
+      "file": "CViewModelBase.cpp",
+      "func": "DispatchEvent",
+      "line": 182
+    },
+    "m4": {
+      "expect": "match",
+      "note": "",
+      "file": "CViewModelBase.cpp",
+      "func": "DispatchEvent",
+      "line": 192
+    },
+    "m5": {
+      "expect": "match",
+      "note": "",
+      "file": "CViewModelBase.cpp",
+      "func": "DispatchEvent",
+      "line": 207
+    },
+    "u1": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_pu.cpp",
+      "func": "WrapperOutputToStep",
+      "line": 0
+    },
+    "u2": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_pu.cpp",
+      "func": "sendNext",
+      "line": 0
+    },
+    "u3": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_pu.cpp",
+      "func": "edge_crop_write",
+      "line": 0
+    },
+    "u5": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_pu.cpp",
+      "func": "releaseFrameResource",
+      "line": 0
+    },
+    "u6": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_pu.cpp",
+      "func": "pipe_core_run_this_step",
+      "line": 0
+    },
+    "a1": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_app_ipc.cpp",
+      "func": "ipc_receive_handler",
+      "line": 0
+    },
+    "a3": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_app_ipc.cpp",
+      "func": "ScanMgrThread",
+      "line": 0
+    },
+    "a4": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_app_ipc.cpp",
+      "func": "ScanMgrCommandProcess",
+      "line": 0
+    },
+    "a5": {
+      "expect": "match",
+      "note": "",
+      "file": "scan_app_ipc.cpp",
+      "func": "image_processing_manager_scan_thread",
+      "line": 0
+    },
+    "e1": {
+      "expect": "issue",
+      "note": "消息含空格前缀的 [3]，会优先于 L777 被误判为行号，导致该行无法命中 line=777 候选",
+      "file": "edge_cases.cpp",
+      "func": "retryScheduler",
+      "line": 777
+    },
+    "e2": {
+      "expect": "match",
+      "note": "7 位行号被正则 \\d{1,6} 丢弃，但被关键字兜底命中（隐患：行号信息丢失，多行共享关键字时会误并）",
+      "file": "edge_cases.cpp",
+      "func": "bigLineLogger",
+      "line": 1234567
+    },
+    "e3": {
+      "expect": "match",
+      "note": "Unicode 关键字匹配",
+      "file": "edge_cases.cpp",
+      "func": "unicodeLogger",
+      "line": 555
+    },
+    "e4": {
+      "expect": "match",
+      "note": "超长行（2000+ 字符）",
+      "file": "edge_cases.cpp",
+      "func": "longLineLogger",
+      "line": 666
+    },
+    "e5": {
+      "expect": "match",
+      "note": "函数名 LOGE 应被排除为 funcName（仅关键字匹配）",
+      "file": "edge_cases.cpp",
+      "func": "LOGE",
+      "line": 0
+    },
+    "e6": {
+      "expect": "match",
+      "note": "TRACE 级别",
+      "file": "edge_cases.cpp",
+      "func": "traceFunc",
+      "line": 0
+    },
+    "e7": {
+      "expect": "match",
+      "note": "FATAL 级别 + 十六进制",
+      "file": "edge_cases.cpp",
+      "func": "fatalHandler",
+      "line": 888
+    },
+    "e8": {
+      "expect": "match",
+      "note": "跨文件同行号 137（CViewModelBase vs PanelView），按文件名消歧",
+      "file": "edge_cases.cpp",
+      "func": "DispatchEvent",
+      "line": 137
+    },
+    "e9": {
+      "expect": "issue",
+      "note": "无行号日志消息含空格前缀 [5]，被误判为行号 5，阻断 Stage B 关键字匹配",
+      "file": "edge_cases.cpp",
+      "func": "warnFunc",
+      "line": 0
+    },
+    "t1": {
+      "expect": "match",
+      "note": "TS 风格日志",
+      "file": "edge_cases_ts.ts",
+      "func": "sendData",
+      "line": 0
+    },
+    "t2": {
+      "expect": "match",
+      "note": "TS L 行号",
+      "file": "edge_cases_ts.ts",
+      "func": "fetchConfig",
+      "line": 909
+    }
+  }
+}

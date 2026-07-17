@@ -1,0 +1,102 @@
+[2026-07-15 10:23:17.372] [10:20:27.027] qio_shm_poll                                     - [WARNING][LINE:143] condition (shmp->flg_fin == 1), return -1.
+log格式解释：[2026-07-15 10:23:17.372] [10:20:27.027]是时间搓
+			  qio_shm_poll 是函数名
+			  [WARNING]是log等级
+			  [LINE:143]是行号
+			  condition (shmp->flg_fin == 1), return -1.是log内容
+[2026-07-15 10:23:17.372] [10:20:27.027] QIO_S_process_routine                            - [INFO][IPS_PROC][311]IPS_PROC: QIO_CLOSE read all bytes= 238112
+log格式解释：[2026-07-15 10:23:17.372] [10:20:27.027]是时间搓
+			  QIO_S_process_routine 是函数名
+			  [INFO]是log等级
+			  [IPS_PROC]是模块名
+			  [311]是行号
+			  IPS_PROC: QIO_CLOSE read all bytes= 238112是log内容
+[2026-07-15 10:23:17.372] [10:20:27.027] qio_shm_peek                                     - [DEBUG]size is 0, no more data to read
+log格式解释：[2026-07-15 10:23:17.372] [10:20:27.027]是时间搓
+			  qio_shm_peek 是函数名
+			  [DEBUG]是log等级
+			  无行号
+			  size is 0, no more data to read是log内容
+[2026-07-15 10:23:17.372] [10:20:27.076] doBeginPage                                      - [INFO][IPSLIB][5266][doBeginPage]PCL: MediaType[0, Plain] 
+log格式解释：[2026-07-15 10:23:17.372] [10:20:27.076]是时间搓
+			  doBeginPage 是函数名
+			  [INFO]是log等级
+			  [IPSLIB]是模块名
+			  [5266]是行号
+			  [doBeginPage]是函数名
+			  PCL: MediaType[0, Plain] 是log内容
+[2026-07-15 10:23:13.457] [10:01:18.878] get_paper_size_name                              - [INFO][SCAN_MFP] paper_type_to_paper_size 0 : 7 
+log格式解释：[2026-07-15 10:23:13.457] [10:01:18.878]是时间搓
+			  get_paper_size_name 是函数名
+			  [INFO]是log等级
+			  [SCAN_MFP]是模块名
+			  paper_type_to_paper_size 0 : 7 是log内容
+[2026-07-15 10:23:17.241] [10:01:41.199] print_info_event_outside_process                 - [INFO]L335 :Receive event head [285409282] !!!
+log格式解释：[2026-07-15 10:23:17.241] [10:01:41.199]是时间搓
+			  print_info_event_outside_process 是函数名
+			  [INFO]是log等级
+			  L335是行号
+			  Receive event head [285409282] !!!是log内容
+[2026-07-15 10:29:42.196] [10:21:15.920] storage_interface_file_dir_access- module/storage/storage_file_dir/storage_dir.c L32    [HAL][ERROR]  -->  /emmcimage/storage//relay/job_00000284/00000206 stat failed cause No such file or directory
+log格式解释：[2026-07-15 10:29:42.196] [10:21:15.920]是时间搓
+			storage_interface_file_dir_access- module/storage/storage_file_dir/storage_dir.c 是文件路径
+			L32 是行号
+			[HAL]是模块名
+			[ERROR]是log等级
+			 -->  /emmcimage/storage//relay/job_00000284/00000206 stat failed cause No such file or directory是log内容
+[2026-07-15 10:23:24.952] [   0:35:50.509][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L176 DispatchEvent():pedk_serv_mgr process start
+log格式解释：[2026-07-15 10:23:24.952] [   0:35:50.509]是时间搓
+			[DEBUG]是log等级
+			/home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp 是文件路径
+			L176 是行号
+			DispatchEvent():pedk_serv_mgr是函数名
+			process start是log内容
+[2026-07-15 10:23:19.087] netsts_save_packet               - [DEBUG]syssts[0x10320002, -1, -1, -1]
+log格式解释：[2026-07-15 10:23:19.087]是时间搓
+			netsts_save_packet是函数名
+			[DEBUG]是log等级
+			syssts[0x10320002, -1, -1, -1]是log内容
+[2026-07-15 10:23:17.292] [10:01:46.781] GLStage::bindGLProgram                           - [DEBUG]Shader program ID: 14
+log格式解释：[2026-07-15 10:23:17.292] [10:01:46.781]是时间搓
+			GLStage::bindGLProgram 是函数名
+			[DEBUG]是log等级
+			Shader program ID: 14是log内容
+[2026-07-15 10:23:17.292] [10:01:47.952] pi_analyse_parm_get_value_with_default_for_int   - [INFO]<#IPM>[JobID:0]strtoul success: 0
+log格式解释：[2026-07-15 10:23:17.292] [10:01:47.952]是时间搓
+			pi_analyse_parm_get_value_with_default_for_int 是函数名
+			[INFO]是log等级
+			Shader program ID: 14是log内容
+
+[2026-07-15 10:23:17.292] [10:01:47.953] GPUProcessunitBase::acquireFrameResource         - [DEBUG][2026-07-15 10:01:47.953] scan_pu: FrameResources acquired, active count: 1
+log格式解释：[2026-07-15 10:23:17.292] [10:01:47.953]是时间搓
+			GPUProcessunitBase::acquireFrameResource 是函数名
+			[DEBUG]是log等级
+			[2026-07-15 10:01:47.953]是时间搓
+			 scan_pu: FrameResources acquired, active count: 1是log内容
+[2026-07-15 10:27:46.734] [10:27:47.548] image_processing_manager_scan_thread             - [INFO]<#IPM>[JobID:0]ipm recv K cali data
+log格式解释：[2026-07-15 10:27:46.734] [10:27:47.548]是时间搓
+			image_processing_manager_scan_thread是函数名
+			[INFO]是log等级
+			<#IPM>是模块名
+			[JobID:0]是作业id
+			ipm recv K cali data是log内容
+[2026-07-15 10:23:13.827] [   0:20:42.350][INFO]  main/viewmodel/touch/common/CViewModelThread.cpp L44 SendEvent():send evt id = 3000006, msg_id = 0
+log格式解释：[2026-07-15 10:23:13.827] [   0:20:42.350]是时间搓
+			[INFO]是log等级
+			main/viewmodel/touch/common/CViewModelThread.cpp 是文件路径
+			L44是行号
+			SendEvent():send是函数名
+			evt id = 3000006, msg_id = 0是log内容
+[2026-07-15 10:23:13.827] [   0:20:42.350][DEBUG] /home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp L149 DispatchEvent():power_mgr process
+log格式解释：[2026-07-15 10:23:13.827] [   0:20:42.350]是时间搓
+			[DEBUG]是log等级
+			main/viewmodel/touch/common/CViewModelThread.cpp 是文件路径
+			L44是行号
+			SendEvent():send是函数名
+			evt id = 3000006, msg_id = 0是log内容
+[2026-07-15 10:27:40.253] [10:27:42.973] video_pcie_band_alloc_suspend                    - [INFO]L423 :[VIDEO] OK
+log格式解释：[2026-07-15 10:27:40.253] [10:27:42.973]是时间搓
+			video_pcie_band_alloc_suspend是函数名
+			[INFO]是log等级
+			L423是行号
+			OK是log内容

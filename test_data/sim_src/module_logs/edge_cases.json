@@ -1,0 +1,135 @@
+{
+  "file": "edge_cases.cpp",
+  "codeSearchResults": [
+    {
+      "id": "e1",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 777,
+      "functionName": "retryScheduler",
+      "matchedText": "retry count [3] remaining",
+      "keywords": [
+        "retry",
+        "count",
+        "remaining"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "e2",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 1234567,
+      "functionName": "bigLineLogger",
+      "matchedText": "seven digit line number",
+      "keywords": [
+        "seven",
+        "digit",
+        "line"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "e3",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 555,
+      "functionName": "unicodeLogger",
+      "matchedText": "处理完成 状态正常 重试",
+      "keywords": [
+        "处理完成",
+        "状态正常"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "e4",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 666,
+      "functionName": "longLineLogger",
+      "matchedText": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX marker_end",
+      "keywords": [
+        "marker_end"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "e5",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 0,
+      "functionName": "LOGE",
+      "matchedText": "critical failure reported",
+      "keywords": [
+        "critical",
+        "failure"
+      ],
+      "level": "ERROR"
+    },
+    {
+      "id": "e6",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 0,
+      "functionName": "traceFunc",
+      "matchedText": "trace point alpha",
+      "keywords": [
+        "trace",
+        "point",
+        "alpha"
+      ],
+      "level": "TRACE"
+    },
+    {
+      "id": "e7",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 888,
+      "functionName": "fatalHandler",
+      "matchedText": "system halt [0xffff]",
+      "keywords": [
+        "system",
+        "halt"
+      ],
+      "level": "FATAL"
+    },
+    {
+      "id": "e8",
+      "codeFile": {
+        "fileName": "PanelView.cpp"
+      },
+      "line": 137,
+      "functionName": "DispatchEvent",
+      "matchedText": "panel view dispatch START",
+      "keywords": [
+        "dispatchevent",
+        "panel",
+        "view"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "e9",
+      "codeFile": {
+        "fileName": "edge_cases.cpp"
+      },
+      "line": 0,
+      "functionName": "warnFunc",
+      "matchedText": "low memory warning [5]",
+      "keywords": [
+        "low",
+        "memory",
+        "warning"
+      ],
+      "level": "WARN"
+    }
+  ]
+}

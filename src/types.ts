@@ -123,13 +123,23 @@ export interface ModuleLog {
   importedAt: number
 }
 
+export interface MatchedLogLine {
+  lineNumber: number
+  lineText: string
+  /** 命中的代码文本（来自模块日志） */
+  codeText?: string
+  /** 命中的代码文件路径（来自模块日志） */
+  codePath?: string
+  /** 命中的代码行号（来自模块日志） */
+  codeLine?: number
+  /** 命中的父函数名（来自模块日志，用于跨模块消歧） */
+  functionName?: string
+}
+
 export interface MatchResult {
   codeResult: CodeSearchResult
   moduleLog: ModuleLog
-  matchedLines: Array<{
-    lineNumber: number
-    lineText: string
-  }>
+  matchedLines: MatchedLogLine[]
 }
 
 export interface MatchSummary {

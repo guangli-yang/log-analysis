@@ -1,0 +1,938 @@
+{
+  "sites": [
+    {
+      "id": "j1",
+      "file": "job_manager.cpp",
+      "fmt": "A",
+      "level": "INFO",
+      "module": "IPSLIB",
+      "line": 1192,
+      "func": "jobRun",
+      "msg": "job->namePipeline[SNIFFER]",
+      "keywords": [
+        "namepipeline"
+      ],
+      "owner": "IPSLIB"
+    },
+    {
+      "id": "j2",
+      "file": "job_manager.cpp",
+      "fmt": "A",
+      "level": "INFO",
+      "module": "IPSLIB",
+      "line": 1201,
+      "func": "jobRun",
+      "msg": "Update job id[284] ",
+      "keywords": [
+        "update",
+        "job",
+        "id"
+      ],
+      "owner": "IPSLIB"
+    },
+    {
+      "id": "j3",
+      "file": "job_manager.cpp",
+      "fmt": "A",
+      "level": "INFO",
+      "module": "IPSLIB",
+      "line": 1215,
+      "func": "jobRun",
+      "msg": "Job Run status [RUN] ",
+      "keywords": [
+        "job",
+        "run",
+        "status"
+      ],
+      "owner": "IPSLIB"
+    },
+    {
+      "id": "s1",
+      "file": "scan_mfp.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_MFP",
+      "line": 0,
+      "func": "scan_parser_thread",
+      "msg": "SCAN_PARSER_STATE_JOB",
+      "keywords": [
+        "scan_parser_state_job"
+      ],
+      "owner": "SCAN_MFP"
+    },
+    {
+      "id": "s2",
+      "file": "scan_mfp.cpp",
+      "fmt": "D",
+      "level": "DEBUG",
+      "module": "SCAN_MFP",
+      "line": 0,
+      "func": "scan_parser_host_message_process",
+      "msg": "no data",
+      "keywords": [
+        "no",
+        "data"
+      ],
+      "owner": "SCAN_MFP"
+    },
+    {
+      "id": "s3",
+      "file": "scan_mfp.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_MFP",
+      "line": 0,
+      "func": "scan_parser_thread",
+      "msg": "SCAN_PARSER_STATE_JOB",
+      "keywords": [
+        "scan_parser_state_job"
+      ],
+      "owner": "SCAN_MFP"
+    },
+    {
+      "id": "s4",
+      "file": "scan_mfp.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_MFP",
+      "line": 0,
+      "func": "mode_answer_0x4D_callback_func",
+      "msg": "PAGE_ON signal  [0==>1] ",
+      "keywords": [
+        "page_on",
+        "signal"
+      ],
+      "owner": "SCAN_MFP"
+    },
+    {
+      "id": "s5",
+      "file": "scan_mfp.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_MFP",
+      "line": 0,
+      "func": "debug_printf_recv_cmd",
+      "msg": "[808.975] SCAN_ENG ADF=>CTL [9c-57-03-74-7f-]",
+      "keywords": [
+        "scan_eng",
+        "adf"
+      ],
+      "owner": "SCAN_MFP"
+    },
+    {
+      "id": "s6",
+      "file": "scan_mfp.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_MFP",
+      "line": 0,
+      "func": "mode_answer_0x57_callback_func",
+      "msg": "0x9c 0x57 0x03 0x74 0x7f ",
+      "keywords": [
+        "0x9c",
+        "0x57"
+      ],
+      "owner": "SCAN_MFP"
+    },
+    {
+      "id": "s7",
+      "file": "scan_mfp.cpp",
+      "fmt": "D",
+      "level": "DEBUG",
+      "module": "SCAN_MFP",
+      "line": 0,
+      "func": "scan_parser_host_message_process",
+      "msg": "no data",
+      "keywords": [
+        "no",
+        "data"
+      ],
+      "owner": "SCAN_MFP"
+    },
+    {
+      "id": "p1",
+      "file": "print_event.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 335,
+      "func": "print_info_event_outside_process",
+      "msg": "Receive event head [285409282] !!!",
+      "keywords": [
+        "receive",
+        "event",
+        "head"
+      ],
+      "owner": "PRINT"
+    },
+    {
+      "id": "p2",
+      "file": "print_event.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 796,
+      "func": "print_relay_send_page_to_relay_read",
+      "msg": "send page 72 to read",
+      "keywords": [
+        "send",
+        "page",
+        "read"
+      ],
+      "owner": "PRINT"
+    },
+    {
+      "id": "c1",
+      "file": "pcie_data.cpp",
+      "fmt": "E",
+      "level": "DEBUG",
+      "module": "",
+      "line": 0,
+      "func": "recv_pcie_data_cb",
+      "msg": "Successfully sent data to USB panel, size: 0",
+      "keywords": [
+        "successfully",
+        "sent",
+        "data",
+        "usb",
+        "panel"
+      ],
+      "owner": "PCIE"
+    },
+    {
+      "id": "c2",
+      "file": "pcie_data.cpp",
+      "fmt": "E",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "usbd_pack_success",
+      "msg": "usbd_pack_success endpoint=0  com=0x83",
+      "keywords": [
+        "usbd_pack_success",
+        "endpoint"
+      ],
+      "owner": "PCIE"
+    },
+    {
+      "id": "c3",
+      "file": "pcie_data.cpp",
+      "fmt": "E",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "usbd_pack_success",
+      "msg": "usbd_pack_success endpoint=0  com=0x82",
+      "keywords": [
+        "usbd_pack_success",
+        "endpoint"
+      ],
+      "owner": "PCIE"
+    },
+    {
+      "id": "c4",
+      "file": "pcie_data.cpp",
+      "fmt": "E",
+      "level": "DEBUG",
+      "module": "",
+      "line": 0,
+      "func": "mfp_3588_data_proc",
+      "msg": "Received 3588 data: header=0x02000004, type=4, value=0, res_type=2, data_len=80",
+      "keywords": [
+        "received",
+        "3588",
+        "data"
+      ],
+      "owner": "PCIE"
+    },
+    {
+      "id": "c5",
+      "file": "pcie_data.cpp",
+      "fmt": "E",
+      "level": "DEBUG",
+      "module": "",
+      "line": 0,
+      "func": "recv_pcie_data_cb",
+      "msg": "Successfully sent data to USB panel, size: 0",
+      "keywords": [
+        "successfully",
+        "sent",
+        "data",
+        "usb",
+        "panel"
+      ],
+      "owner": "PCIE"
+    },
+    {
+      "id": "v1",
+      "file": "video_pipeline.cpp",
+      "fmt": "B",
+      "level": "ERROR",
+      "module": "",
+      "line": 649,
+      "func": "video_pcie_cancel_process",
+      "msg": "[VIDEO] CANCEL",
+      "keywords": [
+        "cancel"
+      ],
+      "owner": "VIDEO"
+    },
+    {
+      "id": "v2",
+      "file": "video_pipeline.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 777,
+      "func": "video_driver_cancel_process",
+      "msg": "[VIDEO] video cancel request",
+      "keywords": [
+        "video",
+        "cancel",
+        "request"
+      ],
+      "owner": "VIDEO"
+    },
+    {
+      "id": "v3",
+      "file": "video_pipeline.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 78,
+      "func": "video_del_all_page_from_list",
+      "msg": "[VIDEO] video page list empty video_pending_list",
+      "keywords": [
+        "video",
+        "page",
+        "list",
+        "empty"
+      ],
+      "owner": "VIDEO"
+    },
+    {
+      "id": "v4",
+      "file": "video_pipeline.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 78,
+      "func": "video_del_all_page_from_list",
+      "msg": "[VIDEO] video page list empty video_printing_list",
+      "keywords": [
+        "video",
+        "page",
+        "list",
+        "empty"
+      ],
+      "owner": "VIDEO"
+    },
+    {
+      "id": "v5",
+      "file": "video_pipeline.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 148,
+      "func": "video_free",
+      "msg": "[VIDEO] VDIEO_LASER_CHDEV_FREE OK ret[0]",
+      "keywords": [
+        "laser",
+        "chdev",
+        "free"
+      ],
+      "owner": "VIDEO"
+    },
+    {
+      "id": "v6",
+      "file": "video_pipeline.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 423,
+      "func": "video_pcie_band_alloc_suspend",
+      "msg": "[VIDEO] OK",
+      "keywords": [
+        "ok"
+      ],
+      "owner": "VIDEO"
+    },
+    {
+      "id": "m1",
+      "file": "CViewModelBase.cpp",
+      "fmt": "C",
+      "level": "DEBUG",
+      "module": "",
+      "line": 137,
+      "func": "DispatchEvent",
+      "path": "/home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp",
+      "msg": "START, ui_proc_ev ev_id = 0x03000006(EVT_ID_UI_POWERMGR_AUTO_BACK), ctrl_id = 0x00000000(UI_CTRL_ID_ALL), state_id = 0x00000000(WINDOW_ID_INVALID), item_id = 0x00000000(UI_ITEM_ID_INVALID)",
+      "keywords": [
+        "dispatchevent",
+        "ui_proc_ev"
+      ],
+      "owner": "UI"
+    },
+    {
+      "id": "m2",
+      "file": "CViewModelBase.cpp",
+      "fmt": "C",
+      "level": "DEBUG",
+      "module": "",
+      "line": 176,
+      "func": "DispatchEvent",
+      "path": "/home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp",
+      "msg": "pedk_serv_mgr process start",
+      "keywords": [
+        "pedk_serv_mgr",
+        "process",
+        "start"
+      ],
+      "owner": "UI"
+    },
+    {
+      "id": "m3",
+      "file": "CViewModelBase.cpp",
+      "fmt": "C",
+      "level": "DEBUG",
+      "module": "",
+      "line": 182,
+      "func": "DispatchEvent",
+      "path": "/home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp",
+      "msg": "pedk_serv_mgr process result = 1(EVT_RES_CONTINUE)",
+      "keywords": [
+        "pedk_serv_mgr",
+        "result"
+      ],
+      "owner": "UI"
+    },
+    {
+      "id": "m4",
+      "file": "CViewModelBase.cpp",
+      "fmt": "C",
+      "level": "DEBUG",
+      "module": "",
+      "line": 192,
+      "func": "DispatchEvent",
+      "path": "/home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp",
+      "msg": "fw process",
+      "keywords": [
+        "fw",
+        "process"
+      ],
+      "owner": "UI"
+    },
+    {
+      "id": "m5",
+      "file": "CViewModelBase.cpp",
+      "fmt": "C",
+      "level": "DEBUG",
+      "module": "",
+      "line": 207,
+      "func": "DispatchEvent",
+      "path": "/home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp",
+      "msg": "ui_proc_ev top_state = 0x00010001(eWINDOW_ID_MAIN), END",
+      "keywords": [
+        "ui_proc_ev",
+        "top_state"
+      ],
+      "owner": "UI"
+    },
+    {
+      "id": "m6",
+      "file": "CViewModelBase.cpp",
+      "fmt": "C",
+      "level": "DEBUG",
+      "module": "",
+      "line": 137,
+      "func": "DispatchEvent",
+      "path": "/home/liuxingjin/Rockchip/lp7265v2r1xc_release/panel_hw_ssd2xx/appsrc/ui/panel/main/framework/CViewModelBase.cpp",
+      "msg": "START, ui_proc_ev ev_id = 0x03000001(EVT_ID_UI_INFO_CTRL_START), ctrl_id = 0x00000001(UI_CTRL_ID_MAIN), state_id = 0x00000000(WINDOW_ID_INVALID), item_id = 0x00000000(UI_ITEM_ID_INVALID)",
+      "keywords": [
+        "dispatchevent",
+        "ui_proc_ev"
+      ],
+      "owner": "UI"
+    },
+    {
+      "id": "u1",
+      "file": "scan_pu.cpp",
+      "fmt": "E",
+      "level": "DEBUG",
+      "module": "",
+      "line": 0,
+      "func": "WrapperOutputToStep",
+      "msg": "scan_pu_wrapper WrapperOutputToStep",
+      "keywords": [
+        "scan_pu_wrapper",
+        "wrapperoutputtostep"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "u2",
+      "file": "scan_pu.cpp",
+      "fmt": "E",
+      "level": "DEBUG",
+      "module": "",
+      "line": 0,
+      "func": "sendNext",
+      "msg": "unit:scan_pu send msg done at time:20260715_100146_891",
+      "keywords": [
+        "unit:scan_pu",
+        "send",
+        "msg",
+        "done"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "u3",
+      "file": "scan_pu.cpp",
+      "fmt": "F",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "edge_crop_write",
+      "msg": "step(edge_crop) is dealing with page -> imgin  : FRONT w 2496 h 3520 s 7488 d 24 f 201",
+      "keywords": [
+        "step(edge_crop)",
+        "imgin",
+        "front"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "u4",
+      "file": "scan_pu.cpp",
+      "fmt": "F",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "edge_crop_write",
+      "msg": "step(edge_crop) is dealing with page -> imgout : FRONT w 2480 h 3520 s 7440 d 24 f 201",
+      "keywords": [
+        "step(edge_crop)",
+        "imgout",
+        "front"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "u5",
+      "file": "scan_pu.cpp",
+      "fmt": "G",
+      "level": "DEBUG",
+      "module": "",
+      "line": 0,
+      "func": "releaseFrameResource",
+      "msg": "scan_pu: FrameResources released, active count: 0",
+      "keywords": [
+        "scan_pu:",
+        "frameresources",
+        "released"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "u6",
+      "file": "scan_pu.cpp",
+      "fmt": "F",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "pipe_core_run_this_step",
+      "msg": "EOI from scan_pu_step",
+      "keywords": [
+        "eoi",
+        "scan_pu_step"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "a1",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_APP",
+      "line": 0,
+      "func": "ipc_receive_handler",
+      "msg": "bio_get_buffer.len :256 msg_type 112 ",
+      "keywords": [
+        "bio_get_buffer.len",
+        "msg_type",
+        "112"
+      ],
+      "owner": "SCAN_APP"
+    },
+    {
+      "id": "a2",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_APP",
+      "line": 0,
+      "func": "ipc_receive_handler",
+      "msg": "bio_get_buffer.len :256 msg_type 115 ",
+      "keywords": [
+        "bio_get_buffer.len",
+        "msg_type",
+        "115"
+      ],
+      "owner": "SCAN_APP"
+    },
+    {
+      "id": "a3",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_APP",
+      "line": 0,
+      "func": "ScanMgrThread",
+      "msg": "msg from pcie: 112 256",
+      "keywords": [
+        "msg",
+        "from",
+        "pcie",
+        "112"
+      ],
+      "owner": "SCAN_APP"
+    },
+    {
+      "id": "a4",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_APP",
+      "line": 0,
+      "func": "ScanMgrCommandProcess",
+      "msg": "recv copy calc data 112",
+      "keywords": [
+        "recv",
+        "copy",
+        "calc",
+        "data",
+        "112"
+      ],
+      "owner": "SCAN_APP"
+    },
+    {
+      "id": "a5",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "F",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "image_processing_manager_scan_thread",
+      "msg": "ipm recv Y cali data",
+      "keywords": [
+        "ipm",
+        "recv",
+        "cali",
+        "data"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "a6",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_APP",
+      "line": 0,
+      "func": "ScanMgrThread",
+      "msg": "msg from pcie: 115 256",
+      "keywords": [
+        "msg",
+        "from",
+        "pcie",
+        "115"
+      ],
+      "owner": "SCAN_APP"
+    },
+    {
+      "id": "a7",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "D",
+      "level": "INFO",
+      "module": "SCAN_APP",
+      "line": 0,
+      "func": "ScanMgrCommandProcess",
+      "msg": "recv copy calc data 115",
+      "keywords": [
+        "recv",
+        "copy",
+        "calc",
+        "data",
+        "115"
+      ],
+      "owner": "SCAN_APP"
+    },
+    {
+      "id": "a8",
+      "file": "scan_app_ipc.cpp",
+      "fmt": "F",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "image_processing_manager_scan_thread",
+      "msg": "ipm recv K cali data",
+      "keywords": [
+        "ipm",
+        "recv",
+        "cali",
+        "data"
+      ],
+      "owner": "IPM"
+    },
+    {
+      "id": "e1",
+      "file": "edge_cases.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 777,
+      "func": "retryScheduler",
+      "msg": "retry count [3] remaining",
+      "keywords": [
+        "retry",
+        "count",
+        "remaining"
+      ],
+      "owner": "EDGE",
+      "expect": "issue",
+      "note": "消息含空格前缀的 [3]，会优先于 L777 被误判为行号，导致该行无法命中 line=777 候选"
+    },
+    {
+      "id": "e2",
+      "file": "edge_cases.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 1234567,
+      "func": "bigLineLogger",
+      "msg": "seven digit line number",
+      "keywords": [
+        "seven",
+        "digit",
+        "line"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "7 位行号被正则 \\d{1,6} 丢弃，但被关键字兜底命中（隐患：行号信息丢失，多行共享关键字时会误并）"
+    },
+    {
+      "id": "e3",
+      "file": "edge_cases.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 555,
+      "func": "unicodeLogger",
+      "msg": "处理完成 状态正常 重试",
+      "keywords": [
+        "处理完成",
+        "状态正常"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "Unicode 关键字匹配"
+    },
+    {
+      "id": "e4",
+      "file": "edge_cases.cpp",
+      "fmt": "B",
+      "level": "INFO",
+      "module": "",
+      "line": 666,
+      "func": "longLineLogger",
+      "msg": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX marker_end",
+      "keywords": [
+        "marker_end"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "超长行（2000+ 字符）"
+    },
+    {
+      "id": "e5",
+      "file": "edge_cases.cpp",
+      "fmt": "E",
+      "level": "ERROR",
+      "module": "",
+      "line": 0,
+      "func": "LOGE",
+      "msg": "critical failure reported",
+      "keywords": [
+        "critical",
+        "failure"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "函数名 LOGE 应被排除为 funcName（仅关键字匹配）"
+    },
+    {
+      "id": "e6",
+      "file": "edge_cases.cpp",
+      "fmt": "D",
+      "level": "TRACE",
+      "module": "EDGE",
+      "line": 0,
+      "func": "traceFunc",
+      "msg": "trace point alpha",
+      "keywords": [
+        "trace",
+        "point",
+        "alpha"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "TRACE 级别"
+    },
+    {
+      "id": "e7",
+      "file": "edge_cases.cpp",
+      "fmt": "B",
+      "level": "FATAL",
+      "module": "",
+      "line": 888,
+      "func": "fatalHandler",
+      "msg": "system halt [0xffff]",
+      "keywords": [
+        "system",
+        "halt"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "FATAL 级别 + 十六进制"
+    },
+    {
+      "id": "e8",
+      "file": "edge_cases.cpp",
+      "fmt": "C",
+      "level": "DEBUG",
+      "module": "",
+      "line": 137,
+      "func": "DispatchEvent",
+      "path": "/proj/ui/PanelView.cpp",
+      "msg": "panel view dispatch START",
+      "keywords": [
+        "dispatchevent",
+        "panel",
+        "view"
+      ],
+      "owner": "UI",
+      "expect": "match",
+      "note": "跨文件同行号 137（CViewModelBase vs PanelView），按文件名消歧"
+    },
+    {
+      "id": "e9",
+      "file": "edge_cases.cpp",
+      "fmt": "E",
+      "level": "WARN",
+      "module": "",
+      "line": 0,
+      "func": "warnFunc",
+      "msg": "low memory warning [5]",
+      "keywords": [
+        "low",
+        "memory",
+        "warning"
+      ],
+      "owner": "EDGE",
+      "expect": "issue",
+      "note": "无行号日志消息含空格前缀 [5]，被误判为行号 5，阻断 Stage B 关键字匹配"
+    },
+    {
+      "id": "t1",
+      "file": "edge_cases_ts.ts",
+      "fmt": "E",
+      "level": "INFO",
+      "module": "",
+      "line": 0,
+      "func": "sendData",
+      "msg": "dispatch event sent [0x12]",
+      "keywords": [
+        "dispatch",
+        "event",
+        "sent"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "TS 风格日志"
+    },
+    {
+      "id": "t2",
+      "file": "edge_cases_ts.ts",
+      "fmt": "B",
+      "level": "DEBUG",
+      "module": "",
+      "line": 909,
+      "func": "fetchConfig",
+      "msg": "config loaded [ok]",
+      "keywords": [
+        "config",
+        "loaded"
+      ],
+      "owner": "EDGE",
+      "expect": "match",
+      "note": "TS L 行号"
+    }
+  ],
+  "lineOf": {
+    "j1": 4,
+    "j2": 5,
+    "j3": 6,
+    "s1": 7,
+    "s2": 8,
+    "s3": 9,
+    "s4": 10,
+    "s5": 11,
+    "s6": 12,
+    "s7": 13,
+    "p1": 14,
+    "p2": 15,
+    "c1": 16,
+    "c2": 17,
+    "c3": 18,
+    "c4": 19,
+    "c5": 20,
+    "v1": 21,
+    "v2": 22,
+    "v3": 23,
+    "v4": 24,
+    "v5": 25,
+    "v6": 26,
+    "m1": 27,
+    "m2": 28,
+    "m3": 29,
+    "m4": 30,
+    "m5": 31,
+    "m6": 32,
+    "u1": 33,
+    "u2": 34,
+    "u3": 35,
+    "u4": 36,
+    "u5": 37,
+    "u6": 38,
+    "a1": 39,
+    "a2": 40,
+    "a3": 41,
+    "a4": 42,
+    "a5": 43,
+    "a6": 44,
+    "a7": 45,
+    "a8": 46,
+    "e1": 47,
+    "e2": 48,
+    "e3": 49,
+    "e4": 50,
+    "e5": 51,
+    "e6": 52,
+    "e7": 53,
+    "e8": 54,
+    "e9": 55,
+    "t1": 56,
+    "t2": 57
+  }
+}

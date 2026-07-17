@@ -1,0 +1,76 @@
+{
+  "file": "CViewModelBase.cpp",
+  "codeSearchResults": [
+    {
+      "id": "m1",
+      "codeFile": {
+        "fileName": "CViewModelBase.cpp"
+      },
+      "line": 137,
+      "functionName": "DispatchEvent",
+      "matchedText": "START, ui_proc_ev ev_id = 0x03000006(EVT_ID_UI_POWERMGR_AUTO_BACK), ctrl_id = 0x00000000(UI_CTRL_ID_ALL), state_id = 0x00000000(WINDOW_ID_INVALID), item_id = 0x00000000(UI_ITEM_ID_INVALID) | START, ui_proc_ev ev_id = 0x03000001(EVT_ID_UI_INFO_CTRL_START), ctrl_id = 0x00000001(UI_CTRL_ID_MAIN), state_id = 0x00000000(WINDOW_ID_INVALID), item_id = 0x00000000(UI_ITEM_ID_INVALID)",
+      "keywords": [
+        "dispatchevent",
+        "ui_proc_ev"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "m2",
+      "codeFile": {
+        "fileName": "CViewModelBase.cpp"
+      },
+      "line": 176,
+      "functionName": "DispatchEvent",
+      "matchedText": "pedk_serv_mgr process start",
+      "keywords": [
+        "pedk_serv_mgr",
+        "process",
+        "start"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "m3",
+      "codeFile": {
+        "fileName": "CViewModelBase.cpp"
+      },
+      "line": 182,
+      "functionName": "DispatchEvent",
+      "matchedText": "pedk_serv_mgr process result = 1(EVT_RES_CONTINUE)",
+      "keywords": [
+        "pedk_serv_mgr",
+        "result"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "m4",
+      "codeFile": {
+        "fileName": "CViewModelBase.cpp"
+      },
+      "line": 192,
+      "functionName": "DispatchEvent",
+      "matchedText": "fw process",
+      "keywords": [
+        "fw",
+        "process"
+      ],
+      "level": "DEBUG"
+    },
+    {
+      "id": "m5",
+      "codeFile": {
+        "fileName": "CViewModelBase.cpp"
+      },
+      "line": 207,
+      "functionName": "DispatchEvent",
+      "matchedText": "ui_proc_ev top_state = 0x00010001(eWINDOW_ID_MAIN), END",
+      "keywords": [
+        "ui_proc_ev",
+        "top_state"
+      ],
+      "level": "DEBUG"
+    }
+  ]
+}

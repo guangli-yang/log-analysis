@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { CodeSearchPattern, CodeSearchResult, AIConfig } from '../types'
+import ThinkingOverlay from './ThinkingOverlay'
 import './CodeSearchPanel.css'
 
 interface CodeSearchPanelProps {
@@ -129,6 +130,12 @@ const CodeSearchPanel: React.FC<CodeSearchPanelProps> = ({
           )}
         </div>
       )}
+
+      <ThinkingOverlay
+        show={isSearching}
+        title="正在检索代码日志…"
+        subtitle="正在扫描代码文件并匹配日志打印，请稍候"
+      />
     </div>
   )
 }

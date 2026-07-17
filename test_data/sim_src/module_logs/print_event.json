@@ -1,0 +1,35 @@
+{
+  "file": "print_event.cpp",
+  "codeSearchResults": [
+    {
+      "id": "p1",
+      "codeFile": {
+        "fileName": "print_event.cpp"
+      },
+      "line": 335,
+      "functionName": "print_info_event_outside_process",
+      "matchedText": "Receive event head [285409282] !!!",
+      "keywords": [
+        "receive",
+        "event",
+        "head"
+      ],
+      "level": "INFO"
+    },
+    {
+      "id": "p2",
+      "codeFile": {
+        "fileName": "print_event.cpp"
+      },
+      "line": 796,
+      "functionName": "print_relay_send_page_to_relay_read",
+      "matchedText": "send page 72 to read",
+      "keywords": [
+        "send",
+        "page",
+        "read"
+      ],
+      "level": "INFO"
+    }
+  ]
+}
