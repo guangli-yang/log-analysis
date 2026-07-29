@@ -254,19 +254,29 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
     cancelledRef.current = true
   }
 
-  const handleOpenResultFile = (fileName: string) => {
-    const fr = batchFileResults.get(fileName)
-    if (fr) {
-      onShowNotification(`结果文件：${fr.resultFilePath}`)
-    }
-  }
+  const handleCopyAllBatchContactInfo = async () => {
+    const contactInfos: string[] = []
+    const seen = new Set<string>()
 
-  const handleCopyBatchCurrentFileResult = async () => {
-    if (personGroups.length === 0) return
-    const text = buildPersonText(personGroups)
+    for (const [, result] of batchFileResults) {
+      if (!result.success || !result.matchSummary) continue
+      const groups = buildPersonGroups(result.matchSummary, moduleMappings)
+      for (const g of groups) {
+        if (g.contactInfo && g.contactName !== '未分配负责人' && !seen.has(g.contactInfo)) {
+          seen.add(g.contactInfo)
+          contactInfos.push(g.contactInfo)
+        }
+      }
+    }
+
+    if (contactInfos.length === 0) {
+      onShowNotification('暂无可复制联系方式')
+      return
+    }
+
     try {
-      await navigator.clipboard.writeText(text)
-      onShowNotification('当前文件结果已复制到剪贴板')
+      await navigator.clipboard.writeText(contactInfos.join('; '))
+      onShowNotification('全部联系方式已复制到剪贴板')
     } catch {
       onShowNotification('复制失败，请手动复制')
     }
@@ -318,6 +328,14 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
           <div className="match-summary-actions">
             <button className="copy-results-btn" onClick={handleCopyResults} title="复制结果">
               📋 复制
+            </button>
+            <button
+              className="copy-results-btn"
+              onClick={handleCopyContactInfo}
+              disabled={!hasAnyContactInfo}
+              title={hasAnyContactInfo ? '复制所有负责人的联系方式（可直接粘贴到邮件收件人）' : '暂无可复制联系方式'}
+            >
+              📧 复制联系方式
             </button>
             {mode === 'single' && (
               <button className="clear-results-btn" onClick={handleClearMatchResults}>
@@ -417,10 +435,37 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
     }
   }
 
-  // ─ 批量结果：已完成文件列表（供下拉） ─
-  const completedFiles = Array.from(batchFileResults.entries())
-    .filter(([, r]) => r.success && r.matchSummary)
-    .map(([name, r]) => ({ name, matchCount: r.matchSummary!.totalMatches }))
+  const handleCopyContactInfo = async () => {
+    const contactInfos: string[] = []
+    for (const g of personGroups) {
+      if (g.contactInfo && g.contactName !== '未分配负责人') {
+        contactInfos.push(g.contactInfo)
+      }
+    }
+    if (contactInfos.length === 0) {
+      onShowNotification('暂无可复制联系方式')
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(contactInfos.join('; '))
+      onShowNotification('联系方式已复制到剪贴板')
+    } catch {
+      onShowNotification('复制失败，请手动复制')
+    }
+  }
+
+  // 当前分析结果中是否有任何联系方式
+  const hasAnyContactInfo = personGroups.some(g => g.contactInfo && g.contactName !== '未分配负责人')
+
+  // 批量结果中是否有任何联系方式
+  const batchHasAnyContactInfo = (() => {
+    for (const [, result] of batchFileResults) {
+      if (!result.success || !result.matchSummary) continue
+      const groups = buildPersonGroups(result.matchSummary, moduleMappings)
+      if (groups.some(g => g.contactInfo && g.contactName !== '未分配负责人')) return true
+    }
+    return false
+  })()
 
   // ═══════════════════════════════════════════════
   //  渲染
@@ -484,48 +529,28 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
         )}
 
         <div className="analysis-content">
-          {displaySummary ? (
-            <>
-              {mode === 'batch' && (
-                <>
-                  {/* ── 批量文件切换 ── */}
-                  <div className="batch-file-selector">
-                    <label className="batch-file-label">查看文件：</label>
-                    <select
-                      className="batch-file-select"
-                      value={currentViewFile}
-                      onChange={e => setCurrentViewFile(e.target.value)}
-                    >
-                      <option value="">— 选择文件 —</option>
-                      {completedFiles.map(f => (
-                        <option key={f.name} value={f.name}>
-                          📄 {f.name} - {f.matchCount}处匹配
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {/* ── 批量操作按钮 ── */}
-                  <div className="batch-result-actions">
-                    <button className="copy-results-btn" onClick={handleCopyBatchCurrentFileResult}>
-                      📋 复制当前文件结果
-                    </button>
-                    {currentViewFile && batchFileResults.has(currentViewFile) && (
-                      <button className="copy-results-btn" onClick={() => handleOpenResultFile(currentViewFile)}>
-                        📄 在编辑器中打开结果文件
-                      </button>
-                    )}
-                  </div>
-                  {/* ── 结果文件路径 ── */}
-                  {currentViewFile && batchFileResults.has(currentViewFile) && (
-                    <div className="batch-result-path">
-                      ✅ 结果文件已保存到：{batchFileResults.get(currentViewFile)!.resultFilePath}
-                    </div>
-                  )}
-                </>
-              )}
-
-              {renderMatchResults()}
-            </>
+          {mode === 'batch' && batchAnalyzedCount > 0 && !isBatchAnalyzing ? (
+            <div className="batch-completion">
+              <div className="batch-completion-stats">
+                <div className="batch-completion-item">✅ 已完成 {batchAnalyzedCount} 个文件分析</div>
+                <div className="batch-completion-item">
+                  📊 累计发现 {batchCumulativeMatches} 处匹配，涉及 {batchCumulativeModules} 个模块
+                </div>
+              </div>
+              <button
+                className="copy-results-btn copy-contacts-btn"
+                onClick={handleCopyAllBatchContactInfo}
+                disabled={!batchHasAnyContactInfo}
+                title={batchHasAnyContactInfo ? '复制所有负责人的联系方式（可直接粘贴到邮件收件人）' : '暂无可复制联系方式'}
+              >
+                📧 复制全部联系方式
+              </button>
+              <div className="batch-completion-hint">
+                💡 结果文件已保存到 {batchFolderPath} 目录下
+              </div>
+            </div>
+          ) : displaySummary ? (
+            renderMatchResults()
           ) : mode === 'single' ? (
             <>
               <div className="match-info">
@@ -585,13 +610,11 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
               )}
             </>
           ) : (
-            <>
-              <div className="no-results">
-                {completedFiles.length > 0
-                  ? `✅ 已完成 ${batchAnalyzedCount} 个文件分析，请在上方下拉选择查看`
-                  : '等待批量分析完成...'}
-              </div>
-            </>
+            <div className="no-results">
+              {mode === 'batch'
+                ? '请选择日志文件夹并开始分析'
+                : '等待批量分析完成...'}
+            </div>
           )}
         </div>
         <ThinkingOverlay show={isMatching} title="正在快速分析…" subtitle="正在匹配日志与代码模块，请稍候" />

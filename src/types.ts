@@ -175,6 +175,8 @@ export interface ModuleMapping {
   codePath: string
   moduleName: string
   contactName: string
+  /** 联系方式（可选）：邮箱、电话等 */
+  contactInfo?: string
 }
 
 export interface ModuleMappingConfig {
@@ -269,6 +271,7 @@ export interface PersonItem {
 /** 按负责人分组的匹配结果 */
 export interface PersonGroup {
   contactName: string       // "张亮"；无映射时 = "未分配负责人"
+  contactInfo?: string      // 联系方式（来自 ModuleMapping）
   totalMatches: number      // 该人总错误行数
   itemCount: number         // 文件·函数项数
   items: PersonItem[]       // 按 matchCount 降序

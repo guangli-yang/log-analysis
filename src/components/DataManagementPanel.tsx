@@ -230,7 +230,7 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
   }, [moduleMappings, onChangeModuleMappings])
 
   const handleAddMapping = useCallback(() => {
-    onChangeModuleMappings([...moduleMappings, { codePath: '', moduleName: '', contactName: '' }])
+    onChangeModuleMappings([...moduleMappings, { codePath: '', moduleName: '', contactName: '', contactInfo: '' }])
   }, [moduleMappings, onChangeModuleMappings])
 
   const handleDeleteMapping = useCallback((index: number) => {
@@ -299,7 +299,8 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
         return (
           (m.codePath || '').toLowerCase().includes(t) ||
           (m.moduleName || '').toLowerCase().includes(t) ||
-          (m.contactName || '').toLowerCase().includes(t)
+          (m.contactName || '').toLowerCase().includes(t) ||
+          (m.contactInfo || '').toLowerCase().includes(t)
         )
       }),
     [moduleMappings, searchTerm]
@@ -433,12 +434,13 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
                       <th>代码路径</th>
                       <th>模块名称</th>
                       <th>负责人</th>
+                      <th>联系方式</th>
                       <th style={{ width: '72px' }}>操作</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredMappings.length === 0 ? (
-                      <tr className="dm-empty-row"><td colSpan={5}>暂无数据</td></tr>
+                      <tr className="dm-empty-row"><td colSpan={6}>暂无数据</td></tr>
                     ) : (
                       filteredMappings.map(({ m, index }, i) => (
                         <tr key={index}>
@@ -451,6 +453,9 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
                           </td>
                           <td>
                             <input className="dm-cell-input" value={m.contactName || ''} onChange={(e) => handleMappingChange(index, 'contactName', e.target.value)} />
+                          </td>
+                          <td>
+                            <input className="dm-cell-input" value={m.contactInfo || ''} onChange={(e) => handleMappingChange(index, 'contactInfo', e.target.value)} placeholder="邮箱/电话（可选）" />
                           </td>
                           <td>
                             <button className="dm-btn danger small" onClick={() => handleDeleteMapping(index)}>删除</button>

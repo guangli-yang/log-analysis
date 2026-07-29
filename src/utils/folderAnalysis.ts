@@ -108,25 +108,32 @@ export function buildPersonGroups(
   summary: MatchSummary,
   moduleMappings: ModuleMapping[]
 ): PersonGroup[] {
-  // 预建 codePath → contactName 映射
-  function resolveContact(codePath: string): string {
+  // 预建 codePath → (contactName, contactInfo) 映射
+  function resolveMapping(codePath: string): { contactName: string; contactInfo?: string } {
     const normalized = normalizePath(codePath)
     for (const m of moduleMappings) {
       if (isPathSegmentMatch(normalized, normalizePath(m.codePath))) {
-        return m.contactName
+        return { contactName: m.contactName, contactInfo: m.contactInfo }
       }
     }
-    return '未分配负责人'
+    return { contactName: '未分配负责人' }
   }
 
   // 按 (contactName, fileName, functionName) 三级分组
   const bucket = new Map<string, Map<string, Map<string, MatchedLogLine[]>>>()
+  // 追踪每个联系人的联系方式（取第一个非空值）
+  const contactInfoByPerson = new Map<string, string | undefined>()
 
   for (const result of summary.results) {
     const codePath = result.codeResult.codeFile?.fileName || ''
-    const contactName = resolveContact(codePath)
+    const { contactName, contactInfo } = resolveMapping(codePath)
     const fileName = codePath.split(/[/\\]/).pop() || codePath || '（未知文件）'
     const funcName = result.codeResult.functionName || '（未识别函数）'
+
+    // 记录联系方式（优先保留非空值）
+    if (!contactInfoByPerson.has(contactName) || !contactInfoByPerson.get(contactName)) {
+      contactInfoByPerson.set(contactName, contactInfo)
+    }
 
     let byFile = bucket.get(contactName)
     if (!byFile) { byFile = new Map(); bucket.set(contactName, byFile) }
@@ -176,6 +183,7 @@ export function buildPersonGroups(
 
     groups.push({
       contactName,
+      contactInfo: contactInfoByPerson.get(contactName),
       totalMatches,
       itemCount: items.length,
       items
