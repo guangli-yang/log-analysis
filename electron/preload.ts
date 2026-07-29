@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectJsonFolder: () => ipcRenderer.invoke('select-json-folder'),
   selectImportConfig: () => ipcRenderer.invoke('select-import-config'),
   selectFolder: () => ipcRenderer.invoke('select-folder'),
+  selectLogFolder: () => ipcRenderer.invoke('select-log-folder'),
   readFile: (filePath: string) => ipcRenderer.invoke('read-file', filePath),
   saveJson: (data: any, defaultName: string) => ipcRenderer.invoke('save-json', data, defaultName),
   selectCodeFolder: (patterns: Array<{ pattern: string; enabled: boolean }>) => ipcRenderer.invoke('select-code-folder', patterns),
@@ -53,6 +54,7 @@ declare global {
     electronAPI: {
       selectFile: () => Promise<{ filePath: string; content: string; fileName: string; lineOffsets: number[] } | null>
       selectMultipleFiles: () => Promise<Array<{ filePath: string; content: string; fileName: string; lineOffsets: number[] }>>
+      selectLogFolder: () => Promise<{ folderPath: string; files: Array<{ fileName: string; filePath: string; size: number; supported: boolean; unsupportedReason?: string }> } | null>
       selectFolder: () => Promise<{ folderPath: string; files: Array<{ filePath: string; content: string; fileName: string; lineOffsets: number[] }> } | null>
       readFile: (filePath: string) => Promise<{ filePath: string; content: string; fileName: string; lineOffsets: number[] } | null>
       saveJson: (data: any, defaultName: string) => Promise<boolean>

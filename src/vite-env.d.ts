@@ -17,6 +17,7 @@ interface ElectronAPI {
   selectJsonFolder: () => Promise<Array<{ filePath: string; content: string; fileName: string }>>
   selectImportConfig: () => Promise<Array<{ filePath: string; content: string; fileName: string }>>
   selectFolder: () => Promise<{ folderPath: string; files: Array<{ filePath: string; content: string; fileName: string }> } | null>
+  selectLogFolder: () => Promise<{ folderPath: string; files: Array<{ fileName: string; filePath: string; size: number; supported: boolean; unsupportedReason?: string }> } | null>
   readFile: (filePath: string) => Promise<{ filePath: string; content: string; fileName: string } | null>
   saveJson: (data: any, defaultName: string) => Promise<boolean>
   selectCodeFolder: (patterns: Array<{ pattern: string; enabled: boolean }>) => Promise<{ folderPath: string; results: CodeSearchResultItem[] } | null>

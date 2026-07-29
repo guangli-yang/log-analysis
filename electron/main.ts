@@ -928,6 +928,50 @@ ipcMain.handle('get-config-projects', async () => {
   }
 })
 
+// ── 日志文件夹浏览（仅返回元信息，不读内容）──
+ipcMain.handle('select-log-folder', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  })
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    const folderPath = result.filePaths[0]
+    const dirFiles = fs.readdirSync(folderPath)
+    const files: Array<{
+      fileName: string
+      filePath: string
+      size: number
+      supported: boolean
+      unsupportedReason?: string
+    }> = []
+
+    for (const file of dirFiles) {
+      const fullPath = path.join(folderPath, file)
+      try {
+        const stat = fs.statSync(fullPath)
+        if (stat.isDirectory()) continue // 跳过子目录
+
+        const ext = path.extname(file).toLowerCase()
+        const isLogN = /\.log\.\d+$/.test(file)
+        const supported = ext === '.log' || ext === '.txt' || ext === '.out' || ext === '.err' || isLogN
+
+        files.push({
+          fileName: file,
+          filePath: fullPath,
+          size: stat.size,
+          supported,
+          unsupportedReason: supported ? undefined : '不支持的文件格式（仅支持 .log/.txt/.out/.err 及 .log.N）'
+        })
+      } catch (err) {
+        console.error(`Failed to stat ${fullPath}:`, err)
+      }
+    }
+
+    return { folderPath, files }
+  }
+  return null
+})
+
 // ========== 项目级配置读写（config/<项目>/code-search|module-mapping） ==========
 
 // 项目配置根目录：开发模式用工作区 config，生产模式用 exe 同级 config

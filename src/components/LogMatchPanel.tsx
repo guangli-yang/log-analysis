@@ -1,7 +1,18 @@
-import React, { useState, useRef, useCallback } from 'react'
-import { CodeSearchResult, ModuleLog, MatchSummary, MatchResult, ModuleMapping } from '../types'
-import { matchModuleAgainstLog } from '../utils/logMatch'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
+import {
+  ModuleLog,
+  MatchSummary,
+  ModuleMapping,
+  FolderFileItem,
+  FolderAnalysisFileResult,
+  LogMatchMode,
+  PerFileStatus,
+  PersonGroup
+} from '../types'
+import { buildMatchSummary, buildPersonGroups, buildPersonText, runBatchAnalysis } from '../utils/folderAnalysis'
 import ThinkingOverlay from './ThinkingOverlay'
+import LogFileSelectionDialog from './LogFileSelectionDialog'
+import FolderAnalysisProgress from './FolderAnalysisProgress'
 import './AnalysisPanel.css'
 
 interface LogMatchPanelProps {
@@ -14,6 +25,11 @@ interface LogMatchPanelProps {
   moduleMappings: ModuleMapping[]
 }
 
+interface FileProgressInfo {
+  fileName: string
+  status: PerFileStatus
+}
+
 const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
   onClose,
   content,
@@ -23,9 +39,36 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
   onRemoveModuleLog,
   moduleMappings
 }) => {
+  // ── 模式 ──
+  const [mode, setMode] = useState<LogMatchMode>('single')
+
+  // ── 单文件模式状态 ──
   const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([])
   const [matchSummary, setMatchSummary] = useState<MatchSummary | null>(null)
   const [isMatching, setIsMatching] = useState(false)
+  const [singleResultHeld, setSingleResultHeld] = useState<MatchSummary | null>(null)
+
+  // ── 批量模式状态 ──
+  const [batchFolderPath, setBatchFolderPath] = useState<string>('')
+  const [batchFiles, setBatchFiles] = useState<FolderFileItem[]>([])
+  const [batchFileResults, setBatchFileResults] = useState<Map<string, FolderAnalysisFileResult>>(new Map())
+  const [batchAnalyzedCount, setBatchAnalyzedCount] = useState(0)
+  const [batchCumulativeMatches, setBatchCumulativeMatches] = useState(0)
+  const [batchCumulativeModules, setBatchCumulativeModules] = useState(0)
+
+  // ── 批量模式 UI 状态 ──
+  const [showFileSelection, setShowFileSelection] = useState(false)
+  const [showProgress, setShowProgress] = useState(false)
+  const [isBatchAnalyzing, setIsBatchAnalyzing] = useState(false)
+  const [progressFiles, setProgressFiles] = useState<FileProgressInfo[]>([])
+  const [progressCurrentIndex, setProgressCurrentIndex] = useState(0)
+  const cancelledRef = useRef(false)
+  const autoCloseTimerRef = useRef<number | null>(null)
+
+  // ── 批量结果浏览 ──
+  const [currentViewFile, setCurrentViewFile] = useState<string>('')
+
+  // ── 通用 ──
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const [position, setPosition] = useState({ x: window.innerWidth - 470, y: 120 })
   const [isDragging, setIsDragging] = useState(false)
@@ -33,6 +76,7 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
   const dragOffset = useRef({ x: 0, y: 0 })
   const panelRef = useRef<HTMLDivElement>(null)
 
+  // ── 关闭 ──
   const handleClose = useCallback(() => {
     if (closing) return
     setClosing(true)
@@ -41,6 +85,26 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
       onClose()
     }, 200)
   }, [closing, onClose])
+
+  // ── 面板关闭时清理计时器 ──
+  useEffect(() => {
+    return () => {
+      if (autoCloseTimerRef.current) {
+        clearTimeout(autoCloseTimerRef.current)
+      }
+    }
+  }, [])
+
+  // ── 当前显示的 MatchSummary ──
+  const displaySummary = mode === 'single'
+    ? matchSummary
+    : (currentViewFile && batchFileResults.has(currentViewFile)
+      ? batchFileResults.get(currentViewFile)!.matchSummary
+      : null)
+
+  // ═══════════════════════════════════════════════
+  //  单文件模式
+  // ═══════════════════════════════════════════════
 
   const handleToggleModule = (id: string) => {
     setSelectedModuleIds(prev =>
@@ -64,93 +128,22 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
       return
     }
 
-    // 显示“思考中”遮罩，并让出事件循环以便遮罩先渲染
     setIsMatching(true)
     await new Promise(resolve => setTimeout(resolve, 20))
 
     try {
       const selectedModules = moduleLogs.filter(m => selectedModuleIds.includes(m.id))
-      const matchResults: MatchResult[] = []
-      const matchedCodePaths = new Set<string>()
       const mainLogLines = content.split('\n')
+      const summary = buildMatchSummary(selectedModules, mainLogLines, moduleMappings)
 
-      selectedModules.forEach(moduleLog => {
-        const moduleMatches = matchModuleAgainstLog(moduleLog, mainLogLines)
-        moduleMatches.forEach(({ candidate, lines }) => {
-          if (lines.length === 0) return
-
-          const codePath = candidate.codeFile?.fileName || moduleLog.name
-          const dummyCodeResult: CodeSearchResult = {
-            codeFile: { fileName: codePath },
-            line: candidate.line,
-            functionName: candidate.functionName || '',
-            matchedPattern: candidate.matchedPattern || '精确匹配',
-            matchedText: candidate.matchedText || `共 ${lines.length} 处匹配`,
-            keywords: candidate.keywords
-          }
-          matchResults.push({
-            codeResult: dummyCodeResult,
-            moduleLog,
-            matchedLines: lines
-          })
-          if (candidate.codeFile?.fileName) {
-            matchedCodePaths.add(candidate.codeFile.fileName)
-          }
-        })
-      })
-
-      if (matchResults.length === 0) {
+      if (!summary || summary.results.length === 0) {
         onShowNotification('未在日志中找到匹配的模块日志')
         return
       }
 
-      const normalizePath = (p: string) => p.replace(/\\/g, '/')
-
-      const isPathSegmentMatch = (codePath: string, mappingPath: string): boolean => {
-        const normalizedCodePath = normalizePath(codePath)
-        const normalizedMappingPath = normalizePath(mappingPath)
-
-        const index = normalizedCodePath.indexOf(normalizedMappingPath)
-        if (index === -1) return false
-
-        const before = index === 0 ? '/' : normalizedCodePath[index - 1]
-        const afterIndex = index + normalizedMappingPath.length
-        const after = afterIndex >= normalizedCodePath.length ? '/' : normalizedCodePath[afterIndex]
-
-        const beforeValid = before === '/' || before === '\\'
-        const afterValid = after === '/' || after === '\\' || afterIndex >= normalizedCodePath.length
-
-        return beforeValid && afterValid
-      }
-
-      const mappingContactInfo: Array<{ moduleName: string; contactName: string }> = []
-      const seenContactInfo = new Set<string>()
-      matchedCodePaths.forEach(codePath => {
-        // 获取所有匹配的映射（不再只取第一个）
-        const matchedMappings = moduleMappings.filter(m => isPathSegmentMatch(codePath, m.codePath))
-        matchedMappings.forEach(mapping => {
-          const key = `${mapping.contactName}-${mapping.moduleName}`
-          if (!seenContactInfo.has(key)) {
-            seenContactInfo.add(key)
-            mappingContactInfo.push({
-              moduleName: mapping.moduleName,
-              contactName: mapping.contactName
-            })
-          }
-        })
-      })
-
-      if (mappingContactInfo.length === 0) {
+      if (summary.contactInfo.length === 0) {
         onShowNotification('匹配到的文件路径未找到对应的模块负责人，请检查映射表配置')
         return
-      }
-
-      const summary: MatchSummary = {
-        totalMatches: matchResults.reduce((sum, r) => sum + r.matchedLines.length, 0),
-        moduleCount: selectedModules.length,
-        patternCount: 1,
-        results: matchResults,
-        contactInfo: mappingContactInfo
       }
 
       setMatchSummary(summary)
@@ -161,115 +154,141 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
 
   const handleClearMatchResults = () => {
     setMatchSummary(null)
+    setSingleResultHeld(null)
     setExpandedItems(new Set())
   }
 
-  const handleCopyResults = async () => {
-    if (!matchSummary) return
+  // ═══════════════════════════════════════════════
+  //  批量模式 — 导入文件夹
+  // ═══════════════════════════════════════════════
 
-    const lines: string[] = []
-    lines.push('📋 快速分析结果')
-    lines.push('')
-    lines.push(`🕐 分析时间：${new Date().toLocaleString()}`)
-    lines.push('')
-    lines.push('👥 异常负责人：')
-    matchSummary.contactInfo.forEach(info => {
-      lines.push(`  • ${info.contactName}（${info.moduleName}）`)
-    })
-    lines.push('')
-    lines.push('📊 统计信息：')
-    lines.push(`  • 模块数量：${matchSummary.moduleCount}`)
-    lines.push(`  • 匹配总数：${matchSummary.totalMatches}`)
-    lines.push('')
-    lines.push('═══════════════════════════════════════')
+  const handleImportFolder = async () => {
+    try {
+      const result = await window.electronAPI.selectLogFolder()
+      if (!result) return
+      setBatchFolderPath(result.folderPath)
+      setBatchFiles(result.files)
+      setShowFileSelection(true)
+    } catch (err) {
+      console.error('导入文件夹失败:', err)
+    }
+  }
 
-    const groupedResults = matchSummary.results.reduce((acc, result) => {
-      const moduleName = result.moduleLog.name
-      if (!acc[moduleName]) {
-        acc[moduleName] = []
+  const handleFileSelectionConfirm = (selectedFiles: FolderFileItem[]) => {
+    setShowFileSelection(false)
+    if (selectedFiles.length === 0) return
+
+    // 前置检查
+    if (moduleLogs.length === 0) {
+      if (!window.confirm('当前项目没有模块日志数据，分析结果将全部为空。是否继续？')) return
+    }
+    if (moduleMappings.length === 0) {
+      if (!window.confirm('当前项目没有模块映射表，分析结果不含负责人信息。是否继续？')) return
+    }
+
+    // 切换到批量模式
+    setMode('batch')
+    // 将当前单文件结果暂存
+    if (matchSummary) {
+      setSingleResultHeld(matchSummary)
+    }
+
+    // 初始化进度
+    const initialProgress: FileProgressInfo[] = selectedFiles.map(f => ({
+      fileName: f.fileName,
+      status: 'waiting'
+    }))
+    setProgressFiles(initialProgress)
+    setProgressCurrentIndex(0)
+    setShowProgress(true)
+    setIsBatchAnalyzing(true)
+    setBatchAnalyzedCount(0)
+    setBatchCumulativeMatches(0)
+    setBatchCumulativeModules(0)
+    setBatchFileResults(new Map())
+    cancelledRef.current = false
+
+    // 启动批量分析
+    runBatchAnalysis({
+      folderPath: batchFolderPath,
+      files: selectedFiles.map(f => ({ fileName: f.fileName, filePath: f.filePath, supported: f.supported })),
+      moduleLogs,
+      moduleMappings,
+      onProgress: (fileIndex, _total, status, currentFile, cumMatches, cumModules) => {
+        setProgressCurrentIndex(fileIndex)
+        setBatchCumulativeMatches(cumMatches)
+        setBatchCumulativeModules(cumModules)
+        setProgressFiles(prev => prev.map(f =>
+          f.fileName === currentFile ? { ...f, status } : f
+        ))
+      },
+      onFileDone: (fileResult) => {
+        setBatchFileResults(prev => {
+          const next = new Map(prev)
+          next.set(fileResult.fileName, fileResult)
+          return next
+        })
+        setBatchAnalyzedCount(prev => prev + 1)
+      },
+      cancelledRef
+    }).then(() => {
+      setIsBatchAnalyzing(false)
+
+      if (cancelledRef.current) {
+        const doneCount = batchFileResults.size
+        onShowNotification(`已取消，已完成 ${doneCount}/${progressFiles.length} 个文件`)
+        setShowProgress(true) // 保留进度面板
+      } else {
+        // 分析完成，3秒后自动关闭进度面板
+        autoCloseTimerRef.current = window.setTimeout(() => {
+          setShowProgress(false)
+        }, 3000)
+        const results = batchFileResults
+        const count = results.size
+        onShowNotification(`已完成 ${count} 个文件分析，结果文件保存在 ${batchFolderPath} 目录下`)
       }
-      acc[moduleName].push(result)
-      return acc
-    }, {} as Record<string, MatchResult[]>)
-
-    Object.entries(groupedResults).forEach(([moduleName, results]) => {
-      const totalMatches = results.reduce((sum, r) => sum + r.matchedLines.length, 0)
-      lines.push('')
-      lines.push(`📦 模块：${moduleName}（共${totalMatches}处匹配）`)
-
-      const patternGroups: Record<string, MatchResult[]> = {}
-      results.forEach(r => {
-        const patternName = r.codeResult.matchedPattern
-        if (!patternGroups[patternName]) {
-          patternGroups[patternName] = []
-        }
-        patternGroups[patternName].push(r)
-      })
-
-      Object.values(patternGroups).forEach(group => {
-        lines.push(`  🔍 ${group[0].codeResult.matchedPattern}`)
-        group.forEach(r => {
-          const codeText = r.codeResult.matchedText || '(无代码文本)'
-          const matchCount = r.matchedLines.length
-          const lineNumbers = r.matchedLines.map(l => l.lineNumber).join(', ')
-          lines.push(`    • ${codeText}（${matchCount}处）`)
-          lines.push(`      日志行：${lineNumbers}`)
-        })
-      })
     })
+  }
 
-    lines.push('')
-    lines.push('═══════════════════════════════════════')
-    lines.push('')
-    lines.push('📝 日志行详情：')
+  const handleCancelBatch = () => {
+    cancelledRef.current = true
+  }
 
-    Object.entries(groupedResults).forEach(([moduleName, results]) => {
-      results.forEach(r => {
-        const codeText = r.codeResult.matchedText || '(无代码文本)'
-        lines.push('')
-        lines.push(`【${moduleName}】${codeText}`)
-        r.matchedLines.forEach(l => {
-          lines.push(`  行${l.lineNumber}: ${l.lineText.trim()}`)
-        })
-      })
-    })
+  const handleOpenResultFile = (fileName: string) => {
+    const fr = batchFileResults.get(fileName)
+    if (fr) {
+      onShowNotification(`结果文件：${fr.resultFilePath}`)
+    }
+  }
 
-    lines.push('')
-    lines.push('═══════════════════════════════════════')
-    lines.push('由 Log Analyzer 生成')
-
-    const text = lines.join('\n')
+  const handleCopyBatchCurrentFileResult = async () => {
+    if (personGroups.length === 0) return
+    const text = buildPersonText(personGroups)
     try {
       await navigator.clipboard.writeText(text)
-      onShowNotification('结果已复制到剪贴板')
-    } catch (err) {
-      console.error('复制失败:', err)
+      onShowNotification('当前文件结果已复制到剪贴板')
+    } catch {
       onShowNotification('复制失败，请手动复制')
     }
   }
 
+  // ═══════════════════════════════════════════════
+  //  拖拽
+  // ═══════════════════════════════════════════════
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.analysis-header')) {
       setIsDragging(true)
-      dragOffset.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      }
+      dragOffset.current = { x: e.clientX - position.x, y: e.clientY - position.y }
     }
   }
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging) {
-      setPosition({
-        x: e.clientX - dragOffset.current.x,
-        y: e.clientY - dragOffset.current.y
-      })
+      setPosition({ x: e.clientX - dragOffset.current.x, y: e.clientY - dragOffset.current.y })
     }
   }
 
-  const handleMouseUp = () => {
-    setIsDragging(false)
-  }
+  const handleMouseUp = () => { setIsDragging(false) }
 
   React.useEffect(() => {
     if (isDragging) {
@@ -282,205 +301,326 @@ const LogMatchPanel: React.FC<LogMatchPanelProps> = ({
     }
   }, [isDragging])
 
+  const personGroups: PersonGroup[] = displaySummary
+    ? buildPersonGroups(displaySummary, moduleMappings)
+    : []
+
+  // ═══════════════════════════════════════════════
+  //  渲染：匹配结果详情（按人分组）
+  // ═══════════════════════════════════════════════
+  const renderMatchResults = () => {
+    if (personGroups.length === 0) return null
+
+    return (
+      <div className="match-results">
+        <div className="match-summary-header">
+          <div className="match-summary-title">匹配结果总结</div>
+          <div className="match-summary-actions">
+            <button className="copy-results-btn" onClick={handleCopyResults} title="复制结果">
+              📋 复制
+            </button>
+            {mode === 'single' && (
+              <button className="clear-results-btn" onClick={handleClearMatchResults}>
+                ✕ 清除
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── 负责人概览 ── */}
+        <div className="person-overview">
+          {personGroups.map(g => (
+            <div key={g.contactName} className="person-overview-card">
+              <span className="person-overview-icon">👤</span>
+              <span className="person-overview-name">{g.contactName}</span>
+              <span className="person-overview-stat">
+                {g.totalMatches} 处错误（{g.itemCount} 个文件·函数）
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* ── 按人分组详细结果 ── */}
+        <div className="person-results-list">
+          {personGroups.map(g => (
+            <div key={g.contactName} className="person-group">
+              <div className="person-header">
+                <span className="person-header-icon">👤</span>
+                <span className="person-header-name">{g.contactName}</span>
+                <span className="person-header-count">{g.totalMatches} 处错误</span>
+              </div>
+              <div className="person-items">
+                {g.items.map((item, idx) => {
+                  const itemKey = `${g.contactName}-${item.fileName}-${item.functionName}-${idx}`
+                  const isExpanded = expandedItems.has(itemKey)
+                  return (
+                    <div key={itemKey} className="person-item">
+                      <div
+                        className="person-item-header"
+                        onClick={() => {
+                          const next = new Set(expandedItems)
+                          if (isExpanded) next.delete(itemKey)
+                          else next.add(itemKey)
+                          setExpandedItems(next)
+                        }}
+                      >
+                        <span className={`match-expand-icon ${isExpanded ? 'expanded' : ''}`}>
+                          {isExpanded ? '▼' : '▶'}
+                        </span>
+                        <div className="person-item-info">
+                          <span className="person-item-file">{item.fileName}</span>
+                          <span className="person-item-sep">·</span>
+                          <span className="person-item-func">{item.functionName}</span>
+                        </div>
+                        <span className="person-item-count">{item.matchCount}处</span>
+                      </div>
+                      {isExpanded && (
+                        <div className="person-item-lines">
+                          {item.matchedLines.map((l, li) => (
+                            <div
+                              key={li}
+                              className="person-line-item"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onNavigateToError(l.lineNumber - 1)
+                                onShowNotification(`已跳转到行 ${l.lineNumber}`)
+                              }}
+                            >
+                              <span className="person-line-num">行 {l.lineNumber}</span>
+                              <span className="person-line-text">{l.lineText.trim()}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ═══════════════════════════════════════════════
+  //  复制结果
+  // ═══════════════════════════════════════════════
+  const handleCopyResults = async () => {
+    if (personGroups.length === 0) return
+    const text = buildPersonText(personGroups)
+    try {
+      await navigator.clipboard.writeText(text)
+      onShowNotification('结果已复制到剪贴板')
+    } catch {
+      onShowNotification('复制失败，请手动复制')
+    }
+  }
+
+  // ─ 批量结果：已完成文件列表（供下拉） ─
+  const completedFiles = Array.from(batchFileResults.entries())
+    .filter(([, r]) => r.success && r.matchSummary)
+    .map(([name, r]) => ({ name, matchCount: r.matchSummary!.totalMatches }))
+
+  // ═══════════════════════════════════════════════
+  //  渲染
+  // ═══════════════════════════════════════════════
   return (
-    <div
-      ref={panelRef}
-      className={`analysis-panel ${closing ? 'closing' : ''}`}
-      style={{ left: position.x, top: position.y }}
-      onMouseDown={handleMouseDown}
-    >
-      <div className="analysis-header">
-        <span className="analysis-title">🔗 快速分析</span>
-        <button className="close-btn" onClick={handleClose}>×</button>
+    <>
+      <div
+        ref={panelRef}
+        className={`analysis-panel ${closing ? 'closing' : ''}`}
+        style={{ left: position.x, top: position.y, width: 460 }}
+        onMouseDown={handleMouseDown}
+      >
+        <div className="analysis-header">
+          <span className="analysis-title">🔗 快速分析</span>
+          <button className="close-btn" onClick={handleClose}>×</button>
+        </div>
+
+        {/* ── Tab 模式切换 ── */}
+        <div className="mode-tab-bar">
+          <button
+            className={`mode-tab ${mode === 'single' ? 'active' : ''}`}
+            onClick={() => {
+              setMode('single')
+              if (singleResultHeld) setMatchSummary(singleResultHeld)
+              setCurrentViewFile('')
+            }}
+          >
+            📄 单文件分析
+          </button>
+          <button
+            className={`mode-tab ${mode === 'batch' ? 'active' : ''}`}
+            onClick={() => setMode('batch')}
+          >
+            📂 文件夹批量
+          </button>
+          <span className="mode-tab-info">
+            {mode === 'single'
+              ? content ? '分析对象：已加载的日志' : '（未加载日志）'
+              : batchFolderPath
+                ? `${batchFolderPath}（已分析 ${batchAnalyzedCount} 个文件）`
+                : '请选择日志文件夹'
+            }
+          </span>
+        </div>
+
+        {/* ── 批量模式：未导入文件夹时显示入口 ── */}
+        {mode === 'batch' && !batchFolderPath && (
+          <div className="batch-top-actions">
+            <button className="select-all-btn import-folder-btn" onClick={handleImportFolder}>
+              📁 导入日志文件夹
+            </button>
+          </div>
+        )}
+        {/* ── 批量模式：已导入文件夹时可重新导入 ── */}
+        {mode === 'batch' && batchFolderPath && (
+          <div className="batch-top-actions">
+            <button className="select-all-btn import-folder-btn" onClick={handleImportFolder}>
+              📁 重新选择文件夹
+            </button>
+          </div>
+        )}
+
+        <div className="analysis-content">
+          {displaySummary ? (
+            <>
+              {mode === 'batch' && (
+                <>
+                  {/* ── 批量文件切换 ── */}
+                  <div className="batch-file-selector">
+                    <label className="batch-file-label">查看文件：</label>
+                    <select
+                      className="batch-file-select"
+                      value={currentViewFile}
+                      onChange={e => setCurrentViewFile(e.target.value)}
+                    >
+                      <option value="">— 选择文件 —</option>
+                      {completedFiles.map(f => (
+                        <option key={f.name} value={f.name}>
+                          📄 {f.name} - {f.matchCount}处匹配
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* ── 批量操作按钮 ── */}
+                  <div className="batch-result-actions">
+                    <button className="copy-results-btn" onClick={handleCopyBatchCurrentFileResult}>
+                      📋 复制当前文件结果
+                    </button>
+                    {currentViewFile && batchFileResults.has(currentViewFile) && (
+                      <button className="copy-results-btn" onClick={() => handleOpenResultFile(currentViewFile)}>
+                        📄 在编辑器中打开结果文件
+                      </button>
+                    )}
+                  </div>
+                  {/* ── 结果文件路径 ── */}
+                  {currentViewFile && batchFileResults.has(currentViewFile) && (
+                    <div className="batch-result-path">
+                      ✅ 结果文件已保存到：{batchFileResults.get(currentViewFile)!.resultFilePath}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {renderMatchResults()}
+            </>
+          ) : mode === 'single' ? (
+            <>
+              <div className="match-info">
+                已导入 {moduleLogs.length} 个模块日志
+                {moduleMappings.length > 0 && (
+                  <span className="mapping-info"> | 已加载 {moduleMappings.length} 条映射</span>
+                )}
+              </div>
+              <div className="module-list-actions">
+                {moduleLogs.length > 0 && (
+                  <button className="select-all-btn" onClick={handleSelectAllModules}>
+                    {selectedModuleIds.length === moduleLogs.length ? '取消全选' : '全选'}
+                  </button>
+                )}
+              </div>
+              {moduleLogs.length > 0 ? (
+                <div className="module-list">
+                  {moduleLogs.map(module => (
+                    <div
+                      key={module.id}
+                      className={`module-item ${selectedModuleIds.includes(module.id) ? 'selected' : ''}`}
+                      onClick={() => handleToggleModule(module.id)}
+                    >
+                      <div className="module-checkbox">
+                        {selectedModuleIds.includes(module.id) ? '✓' : ''}
+                      </div>
+                      <div className="module-info">
+                        <div className="module-name">{module.name}</div>
+                        <div className="module-meta">
+                          {module.lineCount} 行 | {new Date(module.importedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <button
+                        className="remove-module-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onRemoveModuleLog(module.id)
+                          setSelectedModuleIds(prev => prev.filter(id => id !== module.id))
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-results">点击上方按钮导入模块日志</div>
+              )}
+              {selectedModuleIds.length > 0 ? (
+                <button className="analyze-btn match-btn" onClick={handleMatch}>
+                  🔍 开始匹配 {selectedModuleIds.length > 1 ? `(${selectedModuleIds.length} 个模块)` : ''}
+                </button>
+              ) : (
+                <div className="match-hint">
+                  {moduleLogs.length > 0 ? '请先选择要搜索的模块' : '请导入模块日志'}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="no-results">
+                {completedFiles.length > 0
+                  ? `✅ 已完成 ${batchAnalyzedCount} 个文件分析，请在上方下拉选择查看`
+                  : '等待批量分析完成...'}
+              </div>
+            </>
+          )}
+        </div>
+        <ThinkingOverlay show={isMatching} title="正在快速分析…" subtitle="正在匹配日志与代码模块，请稍候" />
       </div>
 
-      <div className="analysis-content">
-        {matchSummary ? (
-          <div className="match-results">
-            <div className="match-summary-header">
-              <div className="match-summary-title">匹配结果总结</div>
-              <div className="match-summary-actions">
-                <button className="copy-results-btn" onClick={handleCopyResults} title="复制结果">
-                  📋 复制
-                </button>
-                <button className="clear-results-btn" onClick={handleClearMatchResults}>
-                  ✕ 清除
-                </button>
-              </div>
-            </div>
-            <div className="match-summary-stats">
-              <div className="contact-summary">
-                <span className="contact-summary-text">
-                  发现异常，请联系以下{' '}
-                  {matchSummary.contactInfo.map((info, index) => (
-                    <span key={index} className="contact-item-inline">
-                      {info.contactName}
-                      <span className="contact-module">（{info.moduleName}）</span>
-                      {index < matchSummary.contactInfo.length - 1 && '，'}
-                    </span>
-                  ))}
-                  <span> 人员</span>
-                </span>
-              </div>
-            </div>
-            <div className="match-results-list">
-              {Object.entries(
-                matchSummary.results.reduce((acc, result) => {
-                  const moduleName = result.moduleLog.name
-                  if (!acc[moduleName]) {
-                    acc[moduleName] = {
-                      moduleLog: result.moduleLog,
-                      patterns: {}
-                    }
-                  }
-                  const patternName = result.codeResult.matchedPattern
-                  if (!acc[moduleName].patterns[patternName]) {
-                    acc[moduleName].patterns[patternName] = {
-                      patternName,
-                      items: []
-                    }
-                  }
-                  acc[moduleName].patterns[patternName].items.push(result)
-                  return acc
-                }, {} as Record<string, { moduleLog: ModuleLog; patterns: Record<string, { patternName: string; items: MatchResult[] }> }>)
-              ).map(([moduleName, moduleData]) => (
-                <div key={moduleName} className="match-module-group">
-                  <div className="match-module-header">
-                    <span className="match-module-icon">📦</span>
-                    <span className="match-module-name">{moduleName}</span>
-                    <span className="match-module-count">
-                      ({moduleData.patterns && Object.values(moduleData.patterns).reduce((sum, p) => sum + p.items.reduce((s, i) => s + i.matchedLines.length, 0), 0)}处匹配)
-                    </span>
-                  </div>
-                  <div className="match-module-content">
-                    {Object.values(moduleData.patterns || {}).map((pattern, pIndex) => (
-                      <div key={pIndex} className="match-pattern-group">
-                        <div className="match-pattern-header">
-                          <span className="match-pattern-icon">🔍</span>
-                          <span className="match-pattern-name">{pattern.patternName}</span>
-                          <span className="match-pattern-count">
-                            ({pattern.items.reduce((sum, item) => sum + item.matchedLines.length, 0)}处)
-                          </span>
-                        </div>
-                        <div className="match-pattern-items">
-                          {pattern.items.map((item, itemIndex) => {
-                            const itemKey = `${moduleName}-${pattern.patternName}-${itemIndex}`
-                            const isExpanded = expandedItems.has(itemKey)
-                            return (
-                              <div key={itemIndex} className="match-code-item">
-                                <div
-                                  className="match-code-header"
-                                  onClick={() => {
-                                    const newExpanded = new Set(expandedItems)
-                                    if (isExpanded) {
-                                      newExpanded.delete(itemKey)
-                                    } else {
-                                      newExpanded.add(itemKey)
-                                    }
-                                    setExpandedItems(newExpanded)
-                                  }}
-                                >
-                                  <span className={`match-expand-icon ${isExpanded ? 'expanded' : ''}`}>
-                                    {isExpanded ? '▼' : '▶'}
-                                  </span>
-                                  <div className="match-code-text">
-                                    代码: {item.codeResult.matchedText}
-                                  </div>
-                                  <span className="match-code-count">
-                                    {item.matchedLines.length}处
-                                  </span>
-                                </div>
-                                {isExpanded && (
-                                  <div className="match-code-lines">
-                                    {item.matchedLines.map((line, lineIndex) => (
-                                      <span
-                                        key={lineIndex}
-                                        className="match-line-tag"
-                                        title={`代码: ${line.codeText || '—'} | 函数: ${line.functionName || '未知'} | 源码行: ${line.codeLine ?? '—'}`}
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          onNavigateToError(line.lineNumber - 1)
-                                          onShowNotification(`已跳转到行 ${line.lineNumber}`)
-                                        }}
-                                      >
-                                        行{line.lineNumber}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="match-info">
-              已导入 {moduleLogs.length} 个模块日志
-              {moduleMappings.length > 0 && (
-                <span className="mapping-info"> | 已加载 {moduleMappings.length} 条映射</span>
-              )}
-            </div>
-            <div className="module-list-actions">
-              {moduleLogs.length > 0 && (
-                <button className="select-all-btn" onClick={handleSelectAllModules}>
-                  {selectedModuleIds.length === moduleLogs.length ? '取消全选' : '全选'}
-                </button>
-              )}
-            </div>
-            {moduleLogs.length > 0 ? (
-              <div className="module-list">
-                {moduleLogs.map(module => (
-                  <div
-                    key={module.id}
-                    className={`module-item ${selectedModuleIds.includes(module.id) ? 'selected' : ''}`}
-                    onClick={() => handleToggleModule(module.id)}
-                  >
-                    <div className="module-checkbox">
-                      {selectedModuleIds.includes(module.id) ? '✓' : ''}
-                    </div>
-                    <div className="module-info">
-                      <div className="module-name">{module.name}</div>
-                      <div className="module-meta">
-                        {module.lineCount} 行 | {new Date(module.importedAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <button
-                      className="remove-module-btn"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onRemoveModuleLog(module.id)
-                        setSelectedModuleIds(prev => prev.filter(id => id !== module.id))
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="no-results">点击上方按钮导入模块日志</div>
-            )}
-            {selectedModuleIds.length > 0 ? (
-              <button className="analyze-btn match-btn" onClick={handleMatch}>
-                🔍 开始匹配 {selectedModuleIds.length > 1 ? `(${selectedModuleIds.length} 个模块)` : ''}
-              </button>
-            ) : (
-              <div className="match-hint">
-                {moduleLogs.length > 0 ? '请先选择要搜索的模块' : '请导入模块日志'}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-      <ThinkingOverlay show={isMatching} title="正在快速分析…" subtitle="正在匹配日志与代码模块，请稍候" />
-    </div>
+      {/* ── 文件选择弹窗 ── */}
+      {showFileSelection && (
+        <LogFileSelectionDialog
+          folderPath={batchFolderPath}
+          files={batchFiles}
+          onConfirm={handleFileSelectionConfirm}
+          onCancel={() => setShowFileSelection(false)}
+        />
+      )}
+
+      {/* ── 进度面板 ── */}
+      {showProgress && (
+        <FolderAnalysisProgress
+          isAnalyzing={isBatchAnalyzing}
+          currentIndex={progressCurrentIndex}
+          total={progressFiles.length}
+          files={progressFiles}
+          cumulativeMatches={batchCumulativeMatches}
+          cumulativeModules={batchCumulativeModules}
+          onCancel={handleCancelBatch}
+          onClose={() => setShowProgress(false)}
+        />
+      )}
+    </>
   )
 }
 

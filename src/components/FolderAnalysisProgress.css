@@ -1,0 +1,186 @@
+.folder-progress-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.folder-progress-dialog {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  width: 480px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.2s ease-out;
+}
+
+.fpd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.fpd-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fpd-close-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.fpd-close-btn:hover:not(.disabled) {
+  color: var(--text-primary);
+}
+
+.fpd-close-btn.disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.fpd-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.fpd-progress-track {
+  flex: 1;
+  height: 10px;
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.fpd-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-color), #4fc3f7);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.fpd-progress-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 70px;
+  text-align: right;
+}
+
+.fpd-stats {
+  padding: 10px 18px;
+  font-size: 12px;
+  color: var(--accent-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.fpd-file-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 35vh;
+  padding: 4px 0;
+}
+
+.fpd-file-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 18px;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.fpd-file-item.waiting {
+  opacity: 0.5;
+}
+
+.fpd-file-item.analyzing {
+  background: rgba(var(--accent-color-rgb, 33, 150, 243), 0.08);
+}
+
+.fpd-file-item.done {
+  opacity: 0.9;
+}
+
+.fpd-file-status {
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 22px;
+}
+
+.fpd-file-name {
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fpd-file-item.analyzing .fpd-file-name {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.fpd-file-item.skipped .fpd-file-name {
+  color: var(--text-muted);
+}
+
+.fpd-file-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.fpd-file-item.analyzing .fpd-file-label {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.fpd-footer {
+  display: flex;
+  justify-content: center;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.fpd-btn {
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.fpd-btn.cancel {
+  background: var(--error-color);
+  color: white;
+}
+
+.fpd-btn.cancel:hover {
+  background: #d32f2f;
+}
+
+.fpd-done-msg {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-color);
+}

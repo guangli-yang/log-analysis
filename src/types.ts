@@ -218,3 +218,58 @@ export interface ChatMessage {
   content: string
   timestamp: number
 }
+
+// ========== 文件夹批量快速分析 ==========
+
+/** 文件夹中扫描到的单个文件元信息 */
+export interface FolderFileItem {
+  fileName: string
+  filePath: string
+  size: number
+  supported: boolean
+  unsupportedReason?: string
+}
+
+/** select-log-folder IPC 返回值 */
+export interface LogFolderResult {
+  folderPath: string
+  files: FolderFileItem[]
+}
+
+/** 批量分析中单文件的处理结果 */
+export interface FolderAnalysisFileResult {
+  fileName: string
+  filePath: string
+  supported: boolean
+  success: boolean
+  /** 匹配摘要（支持格式 + 分析成功时填充） */
+  matchSummary: MatchSummary | null
+  /** 生成的结果文件绝对路径 */
+  resultFilePath: string
+  /** 失败/跳过原因 */
+  reason?: string
+}
+
+/** 批量分析进度中单文件状态 */
+export type PerFileStatus = 'waiting' | 'analyzing' | 'done' | 'skipped'
+
+/** 批量分析面板模式 */
+export type LogMatchMode = 'single' | 'batch'
+
+// ========== 按人分组展示 ==========
+
+/** 人员分组中一个 (文件·函数) 项 */
+export interface PersonItem {
+  fileName: string          // "video_pcie.c"
+  functionName: string      // "video_pcie_cancel_process"；为空时显示「未识别函数」
+  matchCount: number        // 该文件·函数下的总匹配行数
+  matchedLines: MatchedLogLine[]  // 展平后的所有匹配行（已按行号去重）
+}
+
+/** 按负责人分组的匹配结果 */
+export interface PersonGroup {
+  contactName: string       // "张亮"；无映射时 = "未分配负责人"
+  totalMatches: number      // 该人总错误行数
+  itemCount: number         // 文件·函数项数
+  items: PersonItem[]       // 按 matchCount 降序
+}

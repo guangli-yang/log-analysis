@@ -644,233 +644,11 @@
   margin-bottom: 16px;
 }
 
-.contact-item {
-  background: var(--bg-tertiary);
-  padding: 10px 16px;
-  border-radius: 4px;
-  border-left: 3px solid var(--accent-color);
-}
-
-.contact-text {
-  font-size: 14px;
-  color: var(--text-primary);
-}
-
-.contact-text strong {
-  color: var(--accent-color);
-  font-weight: 600;
-}
-
-.contact-summary {
-  background: var(--bg-tertiary);
-  padding: 12px 16px;
-  border-radius: 4px;
-  border-left: 3px solid var(--accent-color);
-}
-
-.contact-summary-text {
-  font-size: 14px;
-  color: var(--text-primary);
-  line-height: 1.6;
-}
-
-.contact-item-inline {
-  display: inline;
-}
-
-.contact-module {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
+/* contact 旧样式已废弃，见 .person-overview-card */
 
 .match-results-list {
   max-height: 350px;
   overflow-y: auto;
-}
-
-.match-result-item {
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 8px;
-}
-
-.match-result-item:last-child {
-  margin-bottom: 0;
-}
-
-.match-result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.match-module {
-  font-weight: 500;
-  color: var(--accent-color);
-  font-size: 13px;
-}
-
-.match-pattern {
-  font-size: 11px;
-  color: var(--text-muted);
-  background: var(--bg-primary);
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-.match-result-detail {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.match-result-lines {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-
-.match-lines-list {
-  background: var(--bg-primary);
-  border-radius: 4px;
-  padding: 6px;
-}
-
-.match-line-item {
-  display: flex;
-  gap: 8px;
-  padding: 4px 0;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 11px;
-}
-
-.match-line-item:last-child {
-  border-bottom: none;
-}
-
-.match-line-num {
-  color: var(--accent-color);
-  min-width: 45px;
-  flex-shrink: 0;
-}
-
-.match-line-text {
-  color: var(--text-primary);
-  word-break: break-all;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.match-more-lines {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 11px;
-  padding: 4px;
-  background: var(--bg-tertiary);
-  border-radius: 3px;
-  margin-top: 4px;
-}
-
-.match-module-group {
-  background: var(--bg-primary);
-  border-radius: 6px;
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-
-.match-module-group:last-child {
-  margin-bottom: 0;
-}
-
-.match-module-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  background: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.match-module-icon {
-  font-size: 14px;
-}
-
-.match-module-name {
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 13px;
-}
-
-.match-module-count {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-left: auto;
-}
-
-.match-module-content {
-  padding: 10px 12px;
-}
-
-.match-pattern-group {
-  margin-bottom: 10px;
-}
-
-.match-pattern-group:last-child {
-  margin-bottom: 0;
-}
-
-.match-pattern-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-  padding-left: 20px;
-}
-
-.match-pattern-icon {
-  font-size: 12px;
-}
-
-.match-pattern-name {
-  font-weight: 500;
-  color: var(--text-primary);
-  font-size: 12px;
-}
-
-.match-pattern-count {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.match-pattern-items {
-  padding-left: 40px;
-}
-
-.match-code-item {
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-  margin-bottom: 6px;
-  overflow: hidden;
-}
-
-.match-code-item:last-child {
-  margin-bottom: 0;
-}
-
-.match-code-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.match-code-header:hover {
-  background: var(--bg-hover);
 }
 
 .match-expand-icon {
@@ -884,14 +662,274 @@
   transform: rotate(0deg);
 }
 
-.match-code-text {
-  font-size: 12px;
-  color: var(--text-secondary);
-  flex: 1;
-  word-break: break-all;
+/* 模块分组旧样式已废弃，见 .person-* 系列 */
+
+/* ═══════════════════════════════════════════════
+   批量分析模式样式
+   ═══════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════
+   模式 Tab 栏
+   ═══════════════════════════════════════════════ */
+
+.mode-tab-bar {
+  display: flex;
+  align-items: center;
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--border-color);
+  padding: 0;
+  gap: 0;
 }
 
-.match-code-count {
+.mode-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: -2px;
+  white-space: nowrap;
+}
+
+.mode-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.mode-tab.active {
+  color: var(--accent-color);
+  border-bottom-color: var(--accent-color);
+  background: var(--bg-secondary);
+}
+
+.mode-tab-info {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+  padding: 0 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+/* 移除旧的 batch-mode-label / batch-mode-info（已废弃） */
+
+.batch-top-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.import-folder-btn {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+  font-weight: 500;
+}
+
+.import-folder-btn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* 批量文件选择器 */
+.batch-file-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.batch-file-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.batch-file-select {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.batch-file-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* 批量结果操作栏 */
+.batch-result-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+/* 结果文件路径提示 */
+.batch-result-path {
+  font-size: 11px;
+  color: var(--accent-color);
+  background: var(--bg-tertiary);
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════
+   按人分组结果样式
+   ═══════════════════════════════════════════════ */
+
+/* ── 负责人概览卡片 ── */
+.person-overview {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.person-overview-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-tertiary);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid var(--accent-color);
+  cursor: default;
+}
+
+.person-overview-icon {
+  font-size: 14px;
+}
+
+.person-overview-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.person-overview-stat {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* ── 按人分组列表 ── */
+.person-results-list {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.person-group {
+  background: var(--bg-primary);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.person-group:last-child {
+  margin-bottom: 0;
+}
+
+.person-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.person-header-icon {
+  font-size: 14px;
+}
+
+.person-header-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.person-header-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+  background: var(--bg-secondary);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* ── 文件·函数项 ── */
+.person-items {
+  padding: 6px 0;
+}
+
+.person-item {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.person-item:last-child {
+  border-bottom: none;
+}
+
+.person-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.person-item-header:hover {
+  background: var(--bg-hover);
+}
+
+.person-item-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.person-item-file {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-color);
+  white-space: nowrap;
+  font-family: 'Consolas', monospace;
+}
+
+.person-item-sep {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.person-item-func {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-family: 'Consolas', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.person-item-count {
   font-size: 11px;
   color: var(--text-muted);
   background: var(--bg-secondary);
@@ -900,28 +938,47 @@
   flex-shrink: 0;
 }
 
-.match-code-lines {
+/* ── 展开的日志行 ── */
+.person-item-lines {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px 10px;
-  padding-top: 0;
-  font-size: 11px;
-  color: var(--text-muted);
+  flex-direction: column;
   border-top: 1px solid var(--border-color);
-  margin-top: 0;
+  background: var(--bg-secondary);
 }
 
-.match-line-tag {
-  background: var(--accent-color);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 3px;
+.person-line-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
   cursor: pointer;
   transition: background 0.2s;
+  border-bottom: 1px solid var(--border-color);
+  align-items: flex-start;
 }
 
-.match-line-tag:hover {
-  background: var(--accent-hover);
+.person-line-item:last-child {
+  border-bottom: none;
 }
+
+.person-line-item:hover {
+  background: var(--bg-hover);
+}
+
+.person-line-num {
+  font-size: 11px;
+  color: var(--accent-color);
+  font-family: 'Consolas', monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 45px;
+  padding-top: 1px;
+}
+
+.person-line-text {
+  font-size: 11px;
+  color: var(--text-primary);
+  font-family: 'Consolas', monospace;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
