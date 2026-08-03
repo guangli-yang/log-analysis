@@ -114,7 +114,8 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
         ignoreKeywords: localIgnoreKeywords,
         coreDumpKeywords: localCoreDumpKeywords,
         highlightConfig: localHighlightConfig,
-        searchTags: localSearchTags
+        searchTags: localSearchTags,
+        codeSearchPatterns: localCodeSearchPatterns
       }
       logger.debug(logCategories.API, '开始导出配置', `包含 ${config.errorKeywords.length} 个错误关键字，${config.searchTags.length} 个快捷标签`)
       const result = await window.electronAPI.exportConfig(config)
@@ -217,6 +218,15 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
       setLocalSearchTags(prev => [...prev, ...newTags])
     }
 
+    if (importedConfig.codeSearchPatterns) {
+      const newPatterns = importedConfig.codeSearchPatterns.filter(
+        p => !localCodeSearchPatterns.some(existing => existing.pattern.toLowerCase() === p.pattern.toLowerCase())
+      )
+      if (newPatterns.length > 0) {
+        setLocalCodeSearchPatterns(prev => [...prev, ...newPatterns])
+      }
+    }
+
     logger.info(logCategories.APP, '合并导入完成', '新的关键字配置已生效')
     setShowImportDialog(false)
     setImportedConfig(null)
@@ -233,6 +243,7 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
     if (importedConfig.coreDumpKeywords) setLocalCoreDumpKeywords(importedConfig.coreDumpKeywords)
     if (importedConfig.highlightConfig) setLocalHighlightConfig(importedConfig.highlightConfig)
     if (importedConfig.searchTags) setLocalSearchTags(importedConfig.searchTags)
+    if (importedConfig.codeSearchPatterns) setLocalCodeSearchPatterns(importedConfig.codeSearchPatterns)
 
     logger.info(logCategories.APP, '替换导入完成', '导入的配置已完全替换当前配置')
     setShowImportDialog(false)

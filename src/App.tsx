@@ -178,6 +178,12 @@ function App() {
           if (config.aiConfig) {
             setAIConfig(config.aiConfig)
           }
+          if (config.codeSearchPatterns && config.codeSearchPatterns.length > 0) {
+            setCodeSearchPatterns(config.codeSearchPatterns)
+          }
+          if (config.codeSearchResults && config.codeSearchResults.length > 0) {
+            setCodeSearchResults(config.codeSearchResults)
+          }
         }
         setConfigLoaded(true)
       } catch (err) {
@@ -215,7 +221,8 @@ function App() {
           highlightConfig,
           searchTags,
           aiConfig,
-          codeSearchResults
+          codeSearchResults,
+          codeSearchPatterns
         }
         await window.electronAPI.saveConfig(config)
       } catch (err) {
@@ -223,7 +230,7 @@ function App() {
       }
     }
     saveConfig()
-  }, [errorKeywords, jobKeywords, ignoreKeywords, coreDumpKeywords, highlightConfig, searchTags, configLoaded, aiConfig, codeSearchResults])
+  }, [errorKeywords, jobKeywords, ignoreKeywords, coreDumpKeywords, highlightConfig, searchTags, configLoaded, aiConfig, codeSearchResults, codeSearchPatterns])
 
   const debounceRef = useRef<number | null>(null)
   const loadingProjectRef = useRef(false)

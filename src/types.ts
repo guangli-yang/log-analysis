@@ -168,6 +168,7 @@ export interface AppConfig {
   searchTags: SearchTag[]
   aiConfig?: AIConfig
   codeSearchResults?: CodeSearchResult[]
+  codeSearchPatterns?: CodeSearchPattern[]
   moduleLogs?: ModuleLog[]
 }
 
