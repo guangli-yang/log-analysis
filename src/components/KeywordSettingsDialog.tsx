@@ -46,6 +46,8 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
   const [newKeyword, setNewKeyword] = useState('')
   const [newDescription, setNewDescription] = useState('')
   const [newCodePatternDesc, setNewCodePatternDesc] = useState('')
+  const [newPatternFuncName, setNewPatternFuncName] = useState('')
+  const [newPatternFilterExpr, setNewPatternFilterExpr] = useState('\\s*\\(\\s*"[^"]*"')
 
   const [localErrorKeywords, setLocalErrorKeywords] = useState<ErrorKeyword[]>([])
   const [localJobKeywords, setLocalJobKeywords] = useState<JobKeyword[]>([])
@@ -284,6 +286,25 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
     setNewDescription('')
   }
 
+  const handleAddPattern = () => {
+    if (!newKeyword.trim() || !newPatternFuncName.trim()) return
+
+    setLocalCodeSearchPatterns([
+      ...localCodeSearchPatterns,
+      {
+        id: Date.now().toString(),
+        name: newKeyword.trim(),
+        pattern: newPatternFuncName.trim() + newPatternFilterExpr,
+        description: newCodePatternDesc.trim(),
+        enabled: true
+      }
+    ])
+    setNewKeyword('')
+    setNewPatternFuncName('')
+    setNewPatternFilterExpr('\\s*\\(\\s*"[^"]*"')
+    setNewCodePatternDesc('')
+  }
+
   const handleRemoveKeyword = (index: number) => {
     switch (activeTab) {
       case 'errors':
@@ -471,44 +492,49 @@ const KeywordSettingsDialog: React.FC<KeywordSettingsDialogProps> = ({
                 ))}
               </div>
               <div className="add-pattern">
-                <input
-                  type="text"
-                  placeholder="模式名称"
-                  value={newKeyword}
-                  onChange={e => setNewKeyword(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="正则表达式"
-                  value={newDescription}
-                  onChange={e => setNewDescription(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="描述（可选）"
-                  value={newCodePatternDesc}
-                  onChange={e => setNewCodePatternDesc(e.target.value)}
-                />
-                <button
-                  className="add-btn"
-                  onClick={() => {
-                    if (newKeyword.trim() && newDescription.trim()) {
-                      setLocalCodeSearchPatterns([
-                        ...localCodeSearchPatterns,
-                        {
-                          id: Date.now().toString(),
-                          name: newKeyword.trim(),
-                          pattern: newDescription.trim(),
-                          description: newCodePatternDesc.trim(),
-                          enabled: true
-                        }
-                      ])
-                      setNewKeyword('')
-                      setNewDescription('')
-                      setNewCodePatternDesc('')
-                    }
-                  }}
-                >
+                <div className="add-pattern-fields">
+                  <div className="add-pattern-row">
+                    <label>模式名称：</label>
+                    <input
+                      type="text"
+                      placeholder="例如：LOGE错误"
+                      value={newKeyword}
+                      onChange={e => setNewKeyword(e.target.value)}
+                    />
+                  </div>
+                  <div className="add-pattern-row">
+                    <label>函数名：</label>
+                    <input
+                      type="text"
+                      placeholder="例如：LOGE"
+                      value={newPatternFuncName}
+                      onChange={e => setNewPatternFuncName(e.target.value)}
+                    />
+                  </div>
+                  <div className="add-pattern-row">
+                    <label>过滤表达式：</label>
+                    <input
+                      type="text"
+                      value={newPatternFilterExpr}
+                      onChange={e => setNewPatternFilterExpr(e.target.value)}
+                    />
+                  </div>
+                  <div className="add-pattern-row">
+                    <label>描述(可选)：</label>
+                    <input
+                      type="text"
+                      placeholder="例如：C/C++ LOGE打印错误"
+                      value={newCodePatternDesc}
+                      onChange={e => setNewCodePatternDesc(e.target.value)}
+                    />
+                  </div>
+                </div>
+                {newPatternFuncName.trim() && (
+                  <div className="pattern-preview">
+                    最终正则：{newPatternFuncName.trim() + newPatternFilterExpr}
+                  </div>
+                )}
+                <button className="add-btn" onClick={handleAddPattern}>
                   添加
                 </button>
               </div>
