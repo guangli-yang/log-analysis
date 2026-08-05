@@ -9,6 +9,7 @@ import LogMatchPanel from './components/LogMatchPanel'
 import GoToLine from './components/GoToLine'
 import { defaultPatterns } from './components/CodeSearchPanel'
 import CodeSearchPanel from './components/CodeSearchPanel'
+import { SearchProgressData } from './components/ThinkingOverlay'
 import SearchResultsPanel from './components/SearchResultsPanel'
 import SearchDialog from './components/SearchDialog'
 import LogPanel from './components/LogPanel'
@@ -86,6 +87,9 @@ function App() {
 
   const [logFiles, setLogFiles] = useState<LogFile[]>([])
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
+  const logFilesRef = useRef<LogFile[]>([])
+  // 保持 ref 同步，供异步回调中安全读取最新值
+  useEffect(() => { logFilesRef.current = logFiles }, [logFiles])
   const [history, setHistory] = useState<string[]>([])
   const [errorKeywords, setErrorKeywords] = useState<ErrorKeyword[]>(defaultErrorKeywords)
   const [undoStack, setUndoStack] = useState<HistoryState[]>([])
@@ -129,6 +133,7 @@ function App() {
   const [projectSystemReady, setProjectSystemReady] = useState(false)
   const [showDataManagement, setShowDataManagement] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [searchProgress, setSearchProgress] = useState<SearchProgressData | null>(null)
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([])
   const [searchTags, setSearchTags] = useState<SearchTag[]>([])
   const [searchHighlights, setSearchHighlights] = useState<SearchHighlight[]>([])
@@ -343,6 +348,19 @@ function App() {
     localStorage.setItem('codeSearchPatterns', JSON.stringify(codeSearchPatterns))
   }, [codeSearchPatterns])
 
+  // 监听代码检索进度
+  const searchErrorRef = useRef(false)
+  useEffect(() => {
+    const api = window.electronAPI
+    if (!api?.on) return
+    const unsubscribe = api.on('code-search-progress', (data: unknown) => {
+      const progress = data as SearchProgressData
+      setSearchProgress(progress)
+      searchErrorRef.current = progress.stage === 'error'
+    })
+    return unsubscribe
+  }, [])
+
   useEffect(() => {
     localStorage.setItem('logHistory', JSON.stringify(history))
   }, [history])
@@ -425,6 +443,47 @@ function App() {
     return () => { offSearch(); offGoto() }
   }, [currentFile])
 
+  // 监听主进程转发的 open-file 事件（拖文件到图标 / 右键"打开方式"等场景）
+  useEffect(() => {
+    const api = window.electronAPI
+    if (!api?.on) return
+
+    const offOpenFile = api.on('open-file', async (filePath: string) => {
+      // 校验文件扩展名
+      const fn = filePath.split(/[\\/]/).pop() || ''
+      if (!fn.endsWith('.log') && !fn.endsWith('.txt') && !fn.endsWith('.out') && !fn.endsWith('.err') && !/\.log\.\d+$/.test(fn)) {
+        return
+      }
+
+      // 避免重复加载已打开的文件
+      const currentFiles = logFilesRef.current
+      const existingIdx = currentFiles.findIndex(f => f.filePath === filePath)
+      if (existingIdx !== -1) {
+        setCurrentFileIndex(existingIdx)
+        logger.info(logCategories.FILE, `open-file: 切换到已打开文件: ${fn}`)
+        return
+      }
+
+      try {
+        const result = await api.readFile(filePath)
+        if (result) {
+          setLogFiles(prev => {
+            const newFiles = [...prev, result]
+            // 在 setLogFiles 回调中同步更新 index，避免闭包陈旧值
+            setCurrentFileIndex(newFiles.length - 1)
+            return newFiles
+          })
+          addToHistory(filePath)
+          logger.info(logCategories.FILE, `open-file: 自动打开文件成功: ${result.fileName}`)
+        }
+      } catch (err) {
+        logger.error(logCategories.FILE, 'open-file: 读取文件失败', String(err))
+      }
+    })
+
+    return () => { offOpenFile() }
+  }, []) // 仅挂载一次，通过 ref 获取最新状态
+
   const handleOpenFile = async () => {
     logger.trace(logCategories.FILE, 'handleOpenFile', 'enter')
     logger.apiStart('selectFile')
@@ -476,12 +535,24 @@ function App() {
   const handleSelectCodeFolder = async () => {
     logger.info(logCategories.SEARCH, '开始代码日志检索')
     setCodeSearchResults([])
+    setSearchProgress(null)
+    searchErrorRef.current = false
     setIsSearching(true)
     try {
       const result = await window.electronAPI.selectCodeFolder(codeSearchPatterns)
+
+      // 如果是主进程推送了 error（如文件枚举失败），不在前端关闭遮罩
+      if (!result && searchErrorRef.current) {
+        return
+      }
+
       setIsSearching(false)
+      setSearchProgress(null)
       if (result && result.results.length > 0) {
         logger.info(logCategories.SEARCH, `代码日志检索完成，找到 ${result.results.length} 个匹配`)
+        if (result.truncated) {
+          setNotification(`⚠️ ${result.truncated.reason}`)
+        }
         const results: CodeSearchResult[] = result.results.map((r: CodeSearchResultItem) => ({
           codeFile: {
             fileName: r.fileName
@@ -498,8 +569,15 @@ function App() {
       }
     } catch (error) {
       setIsSearching(false)
+      setSearchProgress(null)
       logger.error(logCategories.SEARCH, '代码日志检索失败', error instanceof Error ? error.message : String(error))
     }
+  }
+
+  const handleDismissSearchError = () => {
+    setIsSearching(false)
+    setSearchProgress(null)
+    searchErrorRef.current = false
   }
 
   const handleOnlineCodeSearch = async (folderPath: string) => {
@@ -626,6 +704,8 @@ function App() {
 
     const startTime = performance.now()
     const results: SearchResult[] = []
+    const MAX_TEXT_SEARCH_RESULTS = 50000
+    let truncated = false
     const content = logFiles[currentFileIndex].content
     
     logger.timeStart('splitLines')
@@ -652,7 +732,14 @@ function App() {
         if (regex.lastIndex === match.index) {
           regex.lastIndex++
         }
+        // 结果上限检查
+        if (results.length >= MAX_TEXT_SEARCH_RESULTS) {
+          truncated = true
+          break
+        }
       }
+      // 外层上限检查
+      if (truncated) break
       
       if (lineIndex % 10000 === 0 && lineIndex > 0) {
         logger.debug(logCategories.SEARCH, `搜索进度: ${lineIndex}/${lines.length} 行`)
@@ -662,6 +749,11 @@ function App() {
 
     const duration = performance.now() - startTime
     logger.perf(logCategories.SEARCH, `搜索完成: 找到 ${results.length} 个匹配`, duration, `查询: "${query}", 行数: ${lines.length}`)
+
+    if (truncated) {
+      logger.warning(logCategories.SEARCH, `文本搜索结果已达上限 ${MAX_TEXT_SEARCH_RESULTS}，后续结果已截断`)
+      setNotification(`搜索结果已达上限 ${MAX_TEXT_SEARCH_RESULTS} 条，请缩小搜索范围`)
+    }
 
     logger.timeStart('setSearchResults')
     setSearchResults(results)
@@ -1423,8 +1515,12 @@ function App() {
             content: result.content,
             fileName: result.fileName
           }
-          setLogFiles(prev => [...prev, newLogFile])
-          setCurrentFileIndex(logFiles.length)
+          setLogFiles(prev => {
+            const newFiles = [...prev, newLogFile]
+            // 在 setLogFiles 回调中同步更新 currentFileIndex，避免闭包陈旧值
+            setCurrentFileIndex(newFiles.length - 1)
+            return newFiles
+          })
           addToHistory(result.filePath)
           logger.info(logCategories.FILE, `拖拽文件打开成功: ${result.fileName}`)
         }
@@ -1602,6 +1698,8 @@ function App() {
             onExport={() => handleExportCodeResults(codeSearchResults)}
             onImport={handleImportCodeResults}
             onClose={() => setShowCodeSearch(false)}
+            searchProgress={searchProgress}
+            onDismissError={handleDismissSearchError}
           />
         </div>
       )}

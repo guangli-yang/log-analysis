@@ -5,6 +5,70 @@ import { execFile } from 'child_process'
 
 let mainWindow: BrowserWindow | null = null
 
+/**
+ * 从命令行参数中提取文件路径（用于拖文件到图标 / "打开方式" 等场景）
+ * Electron 打包后 process.argv 形如: ['app.exe', 'C:\path\to\file.log']
+ * 开发模式下形如: ['electron.exe', '.', 'C:\path\to\file.log']
+ */
+function getFileFromArgv(argv: string[]): string | null {
+  for (let i = argv.length - 1; i >= 1; i--) {
+    const arg = argv[i]
+    if (arg.startsWith('-')) continue
+    if (arg === '.') continue
+    if (arg.endsWith('.js') || arg.endsWith('.ts')) continue
+    if (arg.endsWith('.js.map')) continue
+    // 排除 Electron/Node 自身的路径
+    if (arg.includes('node_modules')) continue
+    if (arg.includes('electron')) continue
+    if (fs.existsSync(arg)) return arg
+  }
+  return null
+}
+
+/**
+ * 向渲染进程发送打开文件指令（带文件名校验，非日志文件不发送）
+ */
+function sendOpenFileToRenderer(filePath: string) {
+  const ext = path.extname(filePath).toLowerCase()
+  const isLogN = /\.log\.\d+$/.test(filePath)
+  const name = path.basename(filePath).toLowerCase()
+  const supported = ext === '.log' || ext === '.txt' || ext === '.out' || ext === '.err' || isLogN
+  if (!supported) {
+    console.log(`忽略非日志文件: ${filePath}`)
+    return false
+  }
+  console.log(`发送 open-file 到渲染进程: ${filePath}`)
+  mainWindow?.webContents.send('open-file', filePath)
+  return true
+}
+
+// ═══════════════════════════════════════════
+//  单实例锁：阻止重复启动，支持拖文件到图标
+// ═══════════════════════════════════════════
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (_event, commandLine) => {
+    // 已有实例运行时，用户拖文件到图标 → 激活窗口并打开文件
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+    const filePath = getFileFromArgv(commandLine)
+    if (filePath) {
+      sendOpenFileToRenderer(filePath)
+    }
+  })
+}
+
+// macOS / Windows 文件关联打开事件
+app.on('open-file', (_event, filePath) => {
+  _event.preventDefault()
+  sendOpenFileToRenderer(filePath)
+})
+
 interface FileReadResult {
   filePath: string
   content: string
@@ -14,7 +78,29 @@ interface FileReadResult {
 
 function readFileWithLineOffsets(filePath: string): FileReadResult | null {
   try {
+    // 先用 stat 检查文件大小
+    let stat: fs.Stats
+    try {
+      stat = fs.statSync(filePath)
+    } catch {
+      return null
+    }
+
+    const fileSize = stat.size
+    // 大文件：使用异步读取，且不构建 lineOffsets（节省内存）
     const content = fs.readFileSync(filePath, 'utf-8')
+
+    // 大文件不构建 lineOffsets 数组（百万行 = 数 MB 的额外内存）
+    if (fileSize > LARGE_FILE_THRESHOLD) {
+      console.warn(`大文件检测: ${path.basename(filePath)} (${(fileSize / 1024 / 1024).toFixed(1)}MB)，禁用行偏移索引以节省内存`)
+      return {
+        filePath,
+        content,
+        fileName: path.basename(filePath),
+        lineOffsets: [] // 大文件不构建 lineOffsets
+      }
+    }
+
     const lineOffsets: number[] = [0]
     for (let i = 0; i < content.length; i++) {
       if (content[i] === '\n') {
@@ -146,6 +232,15 @@ function createWindow() {
 app.whenReady().then(() => {
   createMenu()
   createWindow()
+
+  // 处理通过命令行传入的文件（拖文件到图标、右键"打开方式"等场景）
+  const openedFile = getFileFromArgv(process.argv)
+  if (openedFile) {
+    // 等待渲染进程加载完毕后发送文件路径
+    mainWindow?.webContents.once('did-finish-load', () => {
+      sendOpenFileToRenderer(openedFile)
+    })
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -413,9 +508,10 @@ ipcMain.handle('import-config', async () => {
 })
 
 const CODE_FILE_EXTENSIONS = ['.ts', '.js', '.tsx', '.jsx', '.java', '.cpp', '.h', '.py', '.go', '.c', '.cs']
-const MAX_FILES = 2000
-const MAX_RESULTS = 5000
+const MAX_FILES = 20000
+const MAX_RESULTS = 50000
 const BATCH_SIZE = 20
+const LARGE_FILE_THRESHOLD = 10 * 1024 * 1024 // 10MB，超过该大小的文件使用异步读取并跳过 lineOffsets 构建
 
 // ═══════════════════════════════════════════════════
 //  ctags 集成 — 编译器级函数名索引
@@ -434,14 +530,20 @@ function getCtagsPath(): string {
  * 使用 ctags 扫描源码根目录，构建全局函数索引。
  * 返回 Map<文件绝对路径, Map<行号, 函数名>>
  */
-function buildGlobalFuncMap(rootDir: string): Promise<Map<string, Map<number, string>>> {
+interface CtagsResult {
+  map: Map<string, Map<number, string>>
+  error?: string
+}
+
+function buildGlobalFuncMap(rootDir: string): Promise<CtagsResult> {
   return new Promise((resolve) => {
     const map = new Map<string, Map<number, string>>()
     const ctags = getCtagsPath()
 
     if (!fs.existsSync(ctags)) {
-      console.warn(`ctags binary not found at: ${ctags}, falling back to regex-based parsing`)
-      resolve(map)
+      const msg = `ctags 二进制文件未找到：${ctags}`
+      console.warn(msg)
+      resolve({ map, error: msg })
       return
     }
 
@@ -453,10 +555,18 @@ function buildGlobalFuncMap(rootDir: string): Promise<Map<string, Map<number, st
       '-R',
       '-o', '-',
       rootDir
-    ], { maxBuffer: 50 * 1024 * 1024, timeout: 60000 }, (err, stdout) => {
+    ], { maxBuffer: 200 * 1024 * 1024, timeout: 60000 }, (err, stdout) => {
       if (err) {
+        let reason = err.message
+        if (reason.includes('maxBuffer')) {
+          reason = `输出内容超过缓冲区上限（200MB），可能源文件数量过多，建议分批检索`
+        } else if (reason.includes('killed') || reason.includes('ETIMEDOUT')) {
+          reason = `扫描超时（60秒），文件数量过多，已降级为正则解析`
+        } else if (reason.includes('ENOENT')) {
+          reason = `ctags 可执行文件不存在`
+        }
         console.warn(`ctags scan failed for ${rootDir}:`, err.message)
-        resolve(map)
+        resolve({ map, error: reason })
         return
       }
 
@@ -484,7 +594,7 @@ function buildGlobalFuncMap(rootDir: string): Promise<Map<string, Map<number, st
       }
 
       console.log(`ctags indexed ${map.size} files with functions in ${rootDir}`)
-      resolve(map)
+      resolve({ map })
     })
   })
 }
@@ -552,8 +662,7 @@ function extractFuncDef(lineText: string): string {
  * 找到最近的函数定义，并兼容 C/C++ 与 JS/TS。
  * 优先向上扫描（函数定义通常位于日志行上方），向上未命中时再向下兜底扫描。
  */
-function getCallerFunctionName(line: string, content: string, lineIndex: number): string {
-  const lines = content.split('\n')
+function getCallerFunctionName(lineIndex: number, lines: string[]): string {
   const total = lines.length
   const SCAN_RANGE = 500 // 向上/向下扫描的最大行数
 
@@ -668,7 +777,7 @@ async function processFile(
             }
           } else {
             // 降级：使用正则扫描
-            funcName = getCallerFunctionName(line, content, lineIndex)
+            funcName = getCallerFunctionName(lineIndex, lines)
           }
 
           results.push({
@@ -698,9 +807,26 @@ ipcMain.handle('select-code-folder', async (_, patterns: Array<{ pattern: string
     const folderPath = result.filePaths[0]
     const enabledPatterns = patterns.filter(p => p.enabled)
     
+    // 通知前端：开始构建 ctags 索引
+    mainWindow?.webContents.send('code-search-progress', {
+      stage: 'ctags',
+      title: '正在构建函数索引…',
+      subtitle: '使用 ctags 扫描代码文件，请稍候'
+    })
+    
     // 构建 ctags 全局函数索引
-    const globalFuncMap = await buildGlobalFuncMap(folderPath)
+    const ctagsResult = await buildGlobalFuncMap(folderPath)
+    const globalFuncMap = ctagsResult.map
     const useCtags = globalFuncMap.size > 0
+
+    if (!useCtags) {
+      const errDetail = ctagsResult.error || '未知原因'
+      mainWindow?.webContents.send('code-search-progress', {
+        stage: 'warning',
+        title: 'ctags 不可用，已降级为正则解析',
+        subtitle: `原因：${errDetail}\n函数名提取可能不够精确，但不影响检索结果`
+      })
+    }
     
     const results: Array<{
       fileName: string
@@ -711,13 +837,36 @@ ipcMain.handle('select-code-folder', async (_, patterns: Array<{ pattern: string
       keywords: string[]
     }> = []
 
+    let truncatedReason = ''
+
     const filePaths: string[] = []
-    for await (const filePath of walkDirectoryAsync(folderPath)) {
-      filePaths.push(filePath)
-      if (filePaths.length >= MAX_FILES) {
-        break
+    try {
+      for await (const filePath of walkDirectoryAsync(folderPath)) {
+        filePaths.push(filePath)
+        if (filePaths.length >= MAX_FILES) {
+          truncatedReason = `源文件数量已达上限 ${MAX_FILES}，后续文件已跳过`
+          break
+        }
       }
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err)
+      mainWindow?.webContents.send('code-search-progress', {
+        stage: 'error',
+        title: '文件枚举失败',
+        subtitle: `无法遍历目录：${errMsg}\n请检查文件夹是否存在或是否有访问权限`
+      })
+      return null
     }
+
+    // 通知前端：进入批量处理阶段
+    mainWindow?.webContents.send('code-search-progress', {
+      stage: 'processing',
+      title: '正在匹配日志打印…',
+      subtitle: '逐文件正则匹配 + 函数名提取',
+      current: 0,
+      total: filePaths.length,
+      foundCount: 0
+    })
 
     for (let i = 0; i < filePaths.length; i += BATCH_SIZE) {
       const batch = filePaths.slice(i, i + BATCH_SIZE)
@@ -728,6 +877,7 @@ ipcMain.handle('select-code-folder', async (_, patterns: Array<{ pattern: string
       for (const fileResults of batchResults) {
         for (const r of fileResults) {
           if (results.length >= MAX_RESULTS) {
+            truncatedReason = truncatedReason || `匹配结果已达上限 ${MAX_RESULTS}，后续结果已截断`
             break
           }
           results.push(r)
@@ -740,10 +890,31 @@ ipcMain.handle('select-code-folder', async (_, patterns: Array<{ pattern: string
         break
       }
       
+      // 推送进度
+      const processed = Math.min(i + BATCH_SIZE, filePaths.length)
+      mainWindow?.webContents.send('code-search-progress', {
+        stage: 'processing',
+        title: '正在匹配日志打印…',
+        subtitle: '逐文件正则匹配 + 函数名提取',
+        current: processed,
+        total: filePaths.length,
+        foundCount: results.length
+      })
+      
       await new Promise(resolve => setTimeout(resolve, 50))
     }
 
-    return { folderPath, results }
+    return {
+      folderPath,
+      results,
+      ...(truncatedReason ? {
+        truncated: {
+          reason: truncatedReason,
+          fileCount: filePaths.length,
+          resultCount: results.length
+        }
+      } : {})
+    }
   }
   return null
 })

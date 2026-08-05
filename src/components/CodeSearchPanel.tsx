@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { CodeSearchPattern, CodeSearchResult, AIConfig } from '../types'
-import ThinkingOverlay from './ThinkingOverlay'
+import ThinkingOverlay, { SearchProgressData } from './ThinkingOverlay'
 import './CodeSearchPanel.css'
 
 interface CodeSearchPanelProps {
@@ -12,6 +12,8 @@ interface CodeSearchPanelProps {
   onExport?: () => void
   onImport?: () => void
   onClose?: () => void
+  searchProgress?: SearchProgressData | null
+  onDismissError?: () => void
 }
 
 type SearchMode = 'offline' | 'online'
@@ -24,7 +26,9 @@ const CodeSearchPanel: React.FC<CodeSearchPanelProps> = ({
   aiConfig,
   onExport,
   onImport,
-  onClose
+  onClose,
+  searchProgress,
+  onDismissError
 }) => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [searchMode, setSearchMode] = useState<SearchMode>('offline')
@@ -135,6 +139,8 @@ const CodeSearchPanel: React.FC<CodeSearchPanelProps> = ({
         show={isSearching}
         title="正在检索代码日志…"
         subtitle="正在扫描代码文件并匹配日志打印，请稍候"
+        progress={searchProgress}
+        onDismiss={onDismissError}
       />
     </div>
   )

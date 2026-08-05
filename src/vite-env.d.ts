@@ -20,7 +20,7 @@ interface ElectronAPI {
   selectLogFolder: () => Promise<{ folderPath: string; files: Array<{ fileName: string; filePath: string; size: number; supported: boolean; unsupportedReason?: string }> } | null>
   readFile: (filePath: string) => Promise<{ filePath: string; content: string; fileName: string } | null>
   saveJson: (data: any, defaultName: string) => Promise<boolean>
-  selectCodeFolder: (patterns: Array<{ pattern: string; enabled: boolean }>) => Promise<{ folderPath: string; results: CodeSearchResultItem[] } | null>
+  selectCodeFolder: (patterns: Array<{ pattern: string; enabled: boolean }>) => Promise<{ folderPath: string; results: CodeSearchResultItem[]; truncated?: { reason: string; fileCount: number; resultCount: number } } | null>
   writeFile: (filePath: string, content: string) => Promise<boolean>
   loadConfig: () => Promise<any>
   saveConfig: (config: any) => Promise<boolean>

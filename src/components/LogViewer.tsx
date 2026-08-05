@@ -22,7 +22,7 @@ interface LogViewerProps {
 
 const BUFFER_SIZE = 20
 
-const LogViewer: React.FC<LogViewerProps> = ({
+const LogViewer: React.FC<LogViewerProps> = React.memo(({
   content,
   fontSize,
   lineHeight,
@@ -49,18 +49,27 @@ const LogViewer: React.FC<LogViewerProps> = ({
   const [editMode, setEditMode] = useState(false)
   const [editContent, setEditContent] = useState(content)
 
-  const lineCount = lineOffsets ? lineOffsets.length : content.split('\n').length
+  // 大文件无 lineOffsets 时，一次性 split 并缓存，避免每行都 split 整个 content
+  const cachedLines = useMemo(() => {
+    if (lineOffsets && lineOffsets.length > 0) return null
+    return content.split('\n')
+  }, [content, lineOffsets])
+
+  const lineCount = (lineOffsets && lineOffsets.length > 0)
+    ? lineOffsets.length
+    : (cachedLines ? cachedLines.length : content.split('\n').length)
   const totalHeight = lineCount * lineHeight
 
   const getLine = useCallback((index: number): string => {
     if (!content) return ''
-    if (lineOffsets && lineOffsets.length > index) {
+    if (lineOffsets && lineOffsets.length > 0 && lineOffsets.length > index) {
       const start = lineOffsets[index]
       const end = index + 1 < lineOffsets.length ? lineOffsets[index + 1] - 1 : content.length
       return content.substring(start, end)
     }
-    return content.split('\n')[index] || ''
-  }, [content, lineOffsets])
+    if (cachedLines && index < cachedLines.length) return cachedLines[index]
+    return ''
+  }, [content, lineOffsets, cachedLines])
 
   const startIndex = Math.max(0, Math.floor(scrollTop / lineHeight) - BUFFER_SIZE)
   const endIndex = Math.min(
@@ -275,8 +284,22 @@ const LogViewer: React.FC<LogViewerProps> = ({
     return () => container.removeEventListener('keydown', handleSelectAll)
   }, [editMode, content, startIndex, endIndex, lineHeight])
 
+  // 高亮结果缓存：避免每次滚动都对相同行重复执行正则匹配
+  const highlightCache = useRef<Map<string, string | JSX.Element[]>>(new Map())
+
+  // 搜索条件变化时清空高亮缓存
+  useEffect(() => {
+    highlightCache.current.clear()
+  }, [content, searchQuery, searchOptions, searchHighlights, selectedText, currentResultIndex])
+
   const highlightLine = useCallback((line: string, lineIndex: number) => {
     if (!searchQuery && !selectedText && searchHighlights.length === 0) return line
+
+    // 构建缓存 key 并检查缓存
+    const highlightHash = searchHighlights.map(h => `${h.query}|${h.options.caseSensitive}|${h.options.useRegex}|${h.options.wholeWord}|${h.color}`).join(',')
+    const cacheKey = `${lineIndex}:${line.length}:${searchQuery}:${selectedText}:${currentResultIndex}:${highlightHash}`
+    const cached = highlightCache.current.get(cacheKey)
+    if (cached !== undefined) return cached
 
     const isCurrentResult = currentResultIndex >= 0 &&
       searchResults[currentResultIndex]?.line === lineIndex
@@ -421,7 +444,9 @@ const LogViewer: React.FC<LogViewerProps> = ({
       parts.push(<span key={`${lineIndex}-end`}>{line.slice(lastIndex)}</span>)
     }
 
-    return parts.length > 0 ? parts : line
+    const result = parts.length > 0 ? parts : line
+    highlightCache.current.set(cacheKey, result)
+    return result
   }, [searchQuery, selectedText, currentResultIndex, searchResults, searchOptions, searchHighlights])
 
   return (
@@ -552,6 +577,6 @@ const LogViewer: React.FC<LogViewerProps> = ({
       )}
     </div>
   )
-}
+})
 
 export default LogViewer
