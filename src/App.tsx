@@ -1365,6 +1365,46 @@ function App() {
   const handleClearStagedModuleLogs = useCallback(() => setStagedModuleLogs([]), [])
   const handleClearStagedModuleMappings = useCallback(() => setStagedModuleMappings([]), [])
 
+  const handleOverwriteModuleMapping = useCallback(async () => {
+    logger.info(logCategories.ANALYSIS, '覆盖导入模块映射表')
+    if (!activeProject) {
+      setNotification('请先选择或创建项目')
+      return
+    }
+    try {
+      const result = await window.electronAPI.importConfig()
+      if (result.success && result.config) {
+        const config = result.config as any
+        const rawMappings = config.mappings || (config.data && config.data.moduleMappings) || (Array.isArray(config) ? config : null)
+        if (rawMappings && Array.isArray(rawMappings)) {
+          const mappings: ModuleMapping[] = rawMappings.map((m: any) => ({
+            codePath: m.codePath || '',
+            moduleName: m.moduleName || '',
+            contactName: m.contactName || '',
+            contactInfo: m.contactInfo || ''
+          }))
+          const existing = await window.electronAPI.loadProjectData(activeProject)
+          await window.electronAPI.saveProjectData(activeProject, {
+            moduleLogs: existing?.moduleLogs || [],
+            moduleMappings: mappings
+          })
+          await switchProject(activeProject)
+          setStagedModuleMappings([])
+          setNotification(`覆盖导入完成：项目「${activeProject}」现有 ${mappings.length} 条映射关系`)
+        } else {
+          setNotification('文件格式无效：缺少 mappings 字段')
+        }
+      } else if (result.reason === 'cancelled') {
+        // 用户取消
+      } else {
+        setNotification('覆盖导入失败')
+      }
+    } catch (err) {
+      console.error('Overwrite module mapping error:', err)
+      setNotification('覆盖导入失败')
+    }
+  }, [activeProject, switchProject])
+
   const handleFilterComplete = useCallback(async (filteredContent: string, filteredFileName: string, removedCount: number) => {
     if (!currentFile) return
 
@@ -1626,6 +1666,7 @@ function App() {
           onStageImportModuleLog={handleStageImportModuleLog}
           onMergeModuleLog={handleMergeModuleLog}
           onStageImportModuleMapping={handleStageImportModuleMapping}
+          onOverwriteModuleMapping={handleOverwriteModuleMapping}
           onMergeModuleMapping={handleMergeModuleMapping}
           onClearStagedModuleLogs={handleClearStagedModuleLogs}
           onClearStagedModuleMappings={handleClearStagedModuleMappings}

@@ -394,3 +394,120 @@
   gap: 8px;
   flex-shrink: 0;
 }
+
+/* 导入模式选择弹窗 */
+.dm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dm-modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 440px;
+  max-width: 92vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.2s ease-out;
+}
+
+.dm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dm-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dm-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dm-modal-close:hover {
+  color: var(--text-primary);
+}
+
+.dm-modal-body {
+  padding: 18px;
+}
+
+.dm-modal-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 14px 0;
+}
+
+.dm-import-mode-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dm-import-mode-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dm-import-mode-item:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
+}
+
+.dm-import-mode-item.active {
+  border-color: var(--accent-color);
+  background: rgba(77, 171, 247, 0.08);
+}
+
+.dm-import-mode-item input[type="radio"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--accent-color);
+}
+
+.dm-import-mode-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dm-import-mode-label strong {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.dm-import-mode-label small {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.dm-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border-color);
+}

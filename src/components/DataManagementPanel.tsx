@@ -20,6 +20,7 @@ interface DataManagementPanelProps {
   onStageImportModuleLog: () => void
   onMergeModuleLog: () => void
   onStageImportModuleMapping: () => void
+  onOverwriteModuleMapping: () => void
   onMergeModuleMapping: () => void
   onClearStagedModuleLogs: () => void
   onClearStagedModuleMappings: () => void
@@ -194,6 +195,7 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
   onStageImportModuleLog,
   onMergeModuleLog,
   onStageImportModuleMapping,
+  onOverwriteModuleMapping,
   onMergeModuleMapping,
   onClearStagedModuleLogs,
   onClearStagedModuleMappings,
@@ -206,6 +208,8 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
   const [newProjectName, setNewProjectName] = useState('')
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set())
   const [closing, setClosing] = useState(false)
+  const [showImportModeDialog, setShowImportModeDialog] = useState(false)
+  const [importMode, setImportMode] = useState<'merge' | 'overwrite'>('merge')
 
   const handleClose = useCallback(() => {
     if (closing) return
@@ -411,7 +415,7 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
                 <span className="dm-section-hint">可直接编辑单元格，修改自动保存到项目配置</span>
                 <div className="dm-section-actions">
                   <button className="dm-btn primary" onClick={handleAddMapping}>+ 新增</button>
-                  <button className="dm-btn" onClick={onStageImportModuleMapping}>+ 导入</button>
+                  <button className="dm-btn" onClick={() => setShowImportModeDialog(true)}>+ 导入</button>
                   <button className="dm-btn" onClick={onMergeModuleMapping} disabled={stagedModuleMappings.length === 0}>合并 ({stagedModuleMappings.length})</button>
                   <button className="dm-btn" onClick={handleExportMappings} disabled={moduleMappings.length === 0}>📤 导出</button>
                   <button className="dm-btn danger" onClick={handleClearMappings} disabled={moduleMappings.length === 0}>一键清空</button>
@@ -513,6 +517,63 @@ const DataManagementPanel: React.FC<DataManagementPanelProps> = ({
         </div>
       </div>
       <ThinkingOverlay show={!!isBusy} title="正在处理…" subtitle="正在深度合并模块数据，请稍候" />
+
+      {/* 模块负责人导入模式选择弹窗 */}
+      {showImportModeDialog && (
+        <div className="dm-modal-overlay" onClick={() => setShowImportModeDialog(false)}>
+          <div className="dm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="dm-modal-header">
+              <span className="dm-modal-title">📥 导入模块负责人表</span>
+              <button className="dm-modal-close" onClick={() => setShowImportModeDialog(false)}>×</button>
+            </div>
+            <div className="dm-modal-body">
+              <p className="dm-modal-desc">请选择导入模式：</p>
+              <div className="dm-import-mode-group">
+                <label className={`dm-import-mode-item ${importMode === 'merge' ? 'active' : ''}`}>
+                  <input
+                    type="radio"
+                    name="dm-import-mode"
+                    checked={importMode === 'merge'}
+                    onChange={() => setImportMode('merge')}
+                  />
+                  <span className="dm-import-mode-label">
+                    <strong>合并导入</strong>
+                    <small>导入数据与现有数据深度合并，同 codePath 的记录会以导入数据覆盖非空字段</small>
+                  </span>
+                </label>
+                <label className={`dm-import-mode-item ${importMode === 'overwrite' ? 'active' : ''}`}>
+                  <input
+                    type="radio"
+                    name="dm-import-mode"
+                    checked={importMode === 'overwrite'}
+                    onChange={() => setImportMode('overwrite')}
+                  />
+                  <span className="dm-import-mode-label">
+                    <strong>覆盖导入</strong>
+                    <small>用导入数据完全替换当前项目中的模块负责人表</small>
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div className="dm-modal-footer">
+              <button className="dm-btn" onClick={() => setShowImportModeDialog(false)}>取消</button>
+              <button
+                className="dm-btn primary"
+                onClick={() => {
+                  setShowImportModeDialog(false)
+                  if (importMode === 'merge') {
+                    onStageImportModuleMapping()
+                  } else {
+                    onOverwriteModuleMapping()
+                  }
+                }}
+              >
+                确认导入
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
