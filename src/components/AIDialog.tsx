@@ -39,6 +39,11 @@ const AIDialog: React.FC<AIDialogProps> = ({
   const [configForm, setConfigForm] = useState<AIConfig>(aiConfig)
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle')
   const [testError, setTestError] = useState('')
+
+  // 当 aiConfig prop 变化时（如加载完成后），同步更新 configForm
+  useEffect(() => {
+    setConfigForm(aiConfig)
+  }, [aiConfig])
   const [isFocused, setIsFocused] = useState(true)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)

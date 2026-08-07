@@ -84,6 +84,7 @@ function App() {
   })
 
   const [configLoaded, setConfigLoaded] = useState(false)
+  const initialLoadDoneRef = useRef(false)
 
   const [logFiles, setLogFiles] = useState<LogFile[]>([])
   const [currentFileIndex, setCurrentFileIndex] = useState(0)
@@ -191,9 +192,16 @@ function App() {
           }
         }
         setConfigLoaded(true)
+        // 延迟标记加载完成，避免本帧的自动保存 useEffect 用默认值覆盖刚加载的配置
+        setTimeout(() => {
+          initialLoadDoneRef.current = true
+        }, 0)
       } catch (err) {
         console.error('Failed to load config:', err)
         setConfigLoaded(true)
+        setTimeout(() => {
+          initialLoadDoneRef.current = true
+        }, 0)
       }
     }
     loadConfig()
@@ -214,7 +222,7 @@ function App() {
   }, [notification])
 
   useEffect(() => {
-    if (!configLoaded) return
+    if (!configLoaded || !initialLoadDoneRef.current) return
 
     const saveConfig = async () => {
       try {
