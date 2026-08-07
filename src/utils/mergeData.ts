@@ -91,7 +91,8 @@ export function deepMergeModuleMappings(existing: ModuleMapping[], incoming: Mod
       map.set(key, {
         codePath: inc.codePath || prev.codePath,
         moduleName: inc.moduleName || prev.moduleName,
-        contactName: inc.contactName || prev.contactName
+        contactName: inc.contactName || prev.contactName,
+        contactInfo: inc.contactInfo || prev.contactInfo
       })
     } else {
       map.set(key, inc)

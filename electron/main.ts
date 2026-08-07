@@ -1300,7 +1300,8 @@ ipcMain.handle('load-project-data', async (_, name: string) => {
               moduleMappings.push({
                 codePath: m.codePath || '',
                 moduleName: m.moduleName || '',
-                contactName: m.contactName || ''
+                contactName: m.contactName || '',
+                contactInfo: m.contactInfo || ''
               })
             }
           }

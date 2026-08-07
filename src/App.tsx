@@ -1222,7 +1222,8 @@ function App() {
           const mappings: ModuleMapping[] = rawMappings.map((m: any) => ({
             codePath: m.codePath || '',
             moduleName: m.moduleName || '',
-            contactName: m.contactName || ''
+            contactName: m.contactName || '',
+            contactInfo: m.contactInfo || ''
           }))
           const existing = await window.electronAPI.loadProjectData(target)
           const existingLogs = existing?.moduleLogs || []
@@ -1327,7 +1328,8 @@ function App() {
           const mappings: ModuleMapping[] = rawMappings.map((m: any) => ({
             codePath: m.codePath || '',
             moduleName: m.moduleName || '',
-            contactName: m.contactName || ''
+            contactName: m.contactName || '',
+            contactInfo: m.contactInfo || ''
           }))
           setStagedModuleMappings(prev => deepMergeModuleMappings(prev, mappings))
           setNotification(`已暂存 ${mappings.length} 条映射关系，待合并到项目「${activeProject || '（未选择）'}」`)
