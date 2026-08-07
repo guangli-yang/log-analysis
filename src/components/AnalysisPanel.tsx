@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { ErrorKeyword, CoreDumpKeyword, IgnoreKeyword } from '../types'
 import { logger, logCategories } from '../utils/logger'
+import TimingAnalysisTab from './TimingAnalysisTab'
 import './AnalysisPanel.css'
 
 interface AnalysisPanelProps {
@@ -33,7 +34,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   onOpenLogExtract,
   onFilterComplete
 }) => {
-  const [activeTab, setActiveTab] = useState<'error' | 'coredump' | 'filter'>('error')
+  const [activeTab, setActiveTab] = useState<'error' | 'coredump' | 'filter' | 'timing'>('error')
   const [errorResults, setErrorResults] = useState<DetectedError[]>([])
   const [coredumpResults, setCoredumpResults] = useState<Array<{ line: number; keyword: string; text: string }>>([])
   const [showGdbHelp, setShowGdbHelp] = useState(false)
@@ -231,6 +232,12 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         >
           🔍 关键词过滤
         </button>
+        <button
+          className={`tab-btn ${activeTab === 'timing' ? 'active' : ''}`}
+          onClick={() => setActiveTab('timing')}
+        >
+          ⏱ 耗时分析
+        </button>
         <div className="tabs-divider"></div>
         <button className="action-btn" onClick={onOpenLogExtract}>
           ✂️ 日志提取
@@ -336,6 +343,14 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
               <div className="no-results">点击按钮开始分析Coredump</div>
             )}
           </div>
+        )}
+
+        {activeTab === 'timing' && (
+          <TimingAnalysisTab
+            content={content}
+            onNavigateToError={onNavigateToError}
+            onShowNotification={onShowNotification}
+          />
         )}
       </div>
     </div>

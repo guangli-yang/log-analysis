@@ -277,3 +277,32 @@ export interface PersonGroup {
   itemCount: number         // 文件·函数项数
   items: PersonItem[]       // 按 matchCount 降序
 }
+
+// ========== 耗时分析 ==========
+
+/** 用户配置的耗时分析节点 */
+export interface TimingNode {
+  id: string
+  keyword: string
+  description: string
+  enabled: boolean
+}
+
+/** 单节点时间记录 */
+export interface TimingEntry {
+  nodeIndex: number
+  nodeKeyword: string
+  lineNumber: number
+  timestamp: string          // 原始 "0:35:50.509"
+  timestampMs: number        // 毫秒值
+  elapsedFromPrevMs?: number // 距前一节点耗时（首节点无此字段）
+}
+
+/** 单轮提取结果 */
+export interface TimingCycle {
+  cycleIndex: number
+  nodes: TimingEntry[]
+  totalElapsedMs: number     // 最后一个节点 - 第一个节点的总耗时
+  isComplete: boolean        // 是否包含所有配置的节点
+  missingNodes?: string[]    // 缺少的节点关键词列表
+}
