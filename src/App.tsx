@@ -1060,9 +1060,13 @@ function App() {
       }
 
       const newFileName = `提取_${modeName}_${currentFile.fileName}`
+      // 在原文件同目录下生成提取文件
+      const parentDir = currentFile.filePath.replace(/[\\/][^\\/]*$/, '')
+      const extractedFilePath = parentDir + '\\' + newFileName
+      await window.electronAPI.writeFile(extractedFilePath, extractedContent)
       const extractedFile: LogFile = {
         fileName: newFileName,
-        filePath: currentFile.filePath + '_extracted',
+        filePath: extractedFilePath,
         content: extractedContent,
         lineOffsets: newLineOffsets
       }
@@ -1413,7 +1417,7 @@ function App() {
     }
   }, [activeProject, switchProject])
 
-  const handleFilterComplete = useCallback(async (filteredContent: string, filteredFileName: string, removedCount: number) => {
+  const handleFilterComplete = useCallback(async (filteredContent: string, _filteredFileName: string, removedCount: number) => {
     if (!currentFile) return
 
     logger.info(logCategories.APP, '关键词过滤完成', `删除了 ${removedCount} 行`)
@@ -1422,10 +1426,13 @@ function App() {
     const filteredFilePath = currentFile.filePath.replace(/(\.[^.]+)$/, `_filtered.$1`)
     await window.electronAPI.writeFile(filteredFilePath, filteredContent)
 
+    // fileName 取 filePath 的 basename，确保显示与实际文件名一致
+    const actualFileName = filteredFilePath.split(/[\\/]/).pop() || filteredFilePath
+
     const newLogFile: LogFile = {
       filePath: filteredFilePath,
       content: filteredContent,
-      fileName: filteredFileName
+      fileName: actualFileName
     }
 
     setLogFiles(prev => [...prev, newLogFile])
